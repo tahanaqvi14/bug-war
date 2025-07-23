@@ -2,8 +2,8 @@ import express  from 'express';
 import dotenv from 'dotenv';// Load variables from .env
 import connectDB from './DB/Connection.js'
 import cookieParser from 'cookie-parser';
-import path from 'path';
 import expressSession from 'express-session';
+
 import usersRoute from './routes/usersRouter.js';
 
 
@@ -121,6 +121,8 @@ app.use(cookieParser())
 // Tells Express: “Anything inside /public folder is available to the browser.
 
 app.use('/',usersRoute);
+// This tells your server: “Whenever someone visits any URL that starts with /, use the usersRoute file to decide what to do.”
+
 
 app.listen(process.env.PORT, () => {
   console.log(`🚀 Server running: http://localhost:${process.env.PORT}`);

@@ -1,20 +1,33 @@
 import mongoose from 'mongoose'
 
 const userSchema=mongoose.Schema({
-    displayname:String,
-    username:String,
+    displayname:{
+        minlength:1,
+        required:true,
+        trim:true
+    },
+    username:{
+        minlength:1,
+        required:true,
+        trim:true,
+        unique:true
+    },
     password:{
         type:String,
-        required:true
+        required:true,
+        minlength:8,
+        
+        trim:true
+        //Removes leading/trailing whitespace automatically before saving.
     },
 
 })
 
-// module.exports = mongoose.model("user", userSchema);
 const User = mongoose.model('User', userSchema);
 export default User;
 
 
+// module.exports = mongoose.model("user", userSchema);
 
 // const userSchema = mongoose.Schema({
 //     fullname: {

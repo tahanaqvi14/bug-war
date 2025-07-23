@@ -1,5 +1,11 @@
 const Joi = require('joi');
+// Joi in JavaScript is a library used to validate data — like checking if a user's input is correct before saving it or sending it to the backend.
+
 const bcrypt = require('bcrypt');
+// bcrypt is used to hash passwords so they are stored safely in the database.
+
+
+
 const userModel = require('../models/user'); 
 const { generateToken } = require('../utils/generateToken');
 
@@ -35,6 +41,7 @@ module.exports.registerUser = async function (req, res) {
 
         req.flash('success', 'Account created successfully. You can now log in.');
         return res.redirect('/');
+        
     } catch (err) {
         console.error(err);
         req.flash('error', 'An error occurred while processing your request');
