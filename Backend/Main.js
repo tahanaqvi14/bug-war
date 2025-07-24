@@ -2,7 +2,14 @@ import express  from 'express';
 import dotenv from 'dotenv';// Load variables from .env
 import connectDB from './DB/Connection.js'
 import cookieParser from 'cookie-parser';
+import { RedisStore } from 'connect-redis';
+import { createClient } from 'redis';
+
 import expressSession from 'express-session';
+//
+// so when user login so session is stored in server & session id is given to cookie and store in browser, when i open a anther page so cookie sent session to server to confirm the info.
+
+
 
 import usersRoute from './routes/usersRouter.js';
 
