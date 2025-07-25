@@ -1,0 +1,163 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Fredoka One', cursive;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: linear-gradient(180deg,
+                    #8fc6bb 0%,
+                    #f9b75a 50%,
+                    #f7a72b 100%);
+            min-height: 100vh;
+        }
+
+        .font-fredoka {
+            font-family: "Fredoka One", cursive;
+        }
+
+        /* Smooth toggle transition */
+        input[type="checkbox"]+div {
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="checkbox"]+div+div {
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Smooth toggle transition */
+        input[type="checkbox1"]+div {
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="checkbox1"]+div+div {
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+    </style>
+</head>
+
+<body
+    class="min-h-screen flex flex-col items-center justify-start bg-gradient-to-b from-[#8dc9c0] via-[#f7b96a] to-[#f9a62b] relative text-[#7a4f0a]">
+    <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+        <div
+            class="mt-10 max-w-[90vw] w-full max-w-md p-6 rounded-3xl bg-[#fce9b8] border-4 border-[#7f4f0a] shadow-[6px_6px_0_0_#7f4f0a] ">
+
+
+
+            <div>
+                <div class="flex items-center space-x-6 mb-6">
+                    <div class="flex-shrink-0 rounded-full border-4 border-[#8a5f1a] p-1">
+                        <img alt="Avatar icon of a man with brown hair and orange shirt inside a circular border"
+                            class="rounded-full" height="96" src="./account.svg" width="96" />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-semibold">
+                            Username
+                        </p>
+                        <p class="text-2xl">
+                            user123
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-10 border-t-4 border-[#d6c6a6] pt-6 py-">
+                    <div class="flex items-center justify-between">
+                        <div class="w-full flex flex-col text-2xl border-b border-[#d9cda3] pb-4">
+                            <span class="text-3xl font-medium">
+                                Display Name
+                            </span>
+                            <p class="text-2xl ">
+                                Usernamessssssssssssss
+                            </p>
+                        </div>
+                        <img alt="Icon of a speaker representing sound" class="w-9 h-9 drop-shadow-md cursor-pointer " height="36" src="./edit.svg" width="36" />
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4">
+                        <div class="w-full flex flex-col text-2xl ">
+                            <span class="text-3xl font-medium">
+                                Password
+                            </span>
+    
+                            <p class="cursor-not-allowed text-2xl ">
+                                password
+                            </p>
+                        </div>
+                        <img alt="Icon of a speaker representing sound" class="w-9 h-9 drop-shadow-md cursor-pointer " height="36" src="./edit.svg" width="36" />
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <ul class="space-y-8 text-[#7a4f0a] font-extrabold text-2xl select-none mt-10 border-t-4 border-[#d6c6a6] pt-6 py-3">
+                <li class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <img alt="Icon of a speaker representing sound" class="w-9 h-9 drop-shadow-md" height="36"
+                            src="./sound.svg" width="36" />
+                        <span class="drop-shadow-sm">Sound</span>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer" for="darkmode-toggle">
+                        <input class="sr-only peer" id="darkmode-toggle" type="checkbox" />
+                        <div
+                            class="w-16 h-9 bg-[#d6c6a6] rounded-full peer peer-checked:bg-green-600 relative shadow-inner">
+                        </div>
+                        <div
+                            class="absolute left-1 top-1 w-7 h-7 bg-[#e6e3c3] rounded-full peer-checked:translate-x-7 transition-transform shadow-md">
+                        </div>
+                    </label>
+
+                </li>
+                <li class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <img alt="Icon of a crescent moon representing music" class="w-9 h-9 " height="36"
+                            src="./music.svg" width="36" />
+                        <span class="drop-shadow-sm">Music</span>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer" for="music-toggle">
+                        <input class="sr-only peer" id="music-toggle" type="checkbox" />
+                        <div
+                            class="w-16 h-9 bg-[#d6c6a6] rounded-full peer peer-checked:bg-green-600 relative shadow-inner">
+                        </div>
+                        <div
+                            class="absolute left-1 top-1 w-7 h-7 bg-[#e6e3c3] rounded-full peer-checked:translate-x-7 transition-transform shadow-md">
+                        </div>
+                    </label>
+                </li>
+                <!-- <li class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <img alt="Icon of a gear representing dark mode" class="w-9 h-9 drop-shadow-md" height="36"
+                            src="https://storage.googleapis.com/a1aa/image/13a0311a-da56-400a-b12e-0acc44932860.jpg"
+                            style="filter: brightness(0) saturate(100%) sepia(70%) hue-rotate(30deg) saturate(400%) brightness(80%)"
+                            width="36" />
+                        <span class="drop-shadow-sm">Dark Mode</span>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer" for="darkmode-toggle">
+                        <input class="sr-only peer" id="darkmode-toggle" type="checkbox" />
+                        <div
+                            class="w-16 h-9 bg-[#d6c6a6] rounded-full peer peer-checked:bg-green-600 relative shadow-inner">
+                        </div>
+                        <div
+                            class="absolute left-1 top-1 w-7 h-7 bg-[#e6e3c3] rounded-full peer-checked:translate-x-7 transition-transform shadow-md">
+                        </div>
+                    </label>
+
+                </li> -->
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>
