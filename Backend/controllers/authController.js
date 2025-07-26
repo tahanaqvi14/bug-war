@@ -2,7 +2,11 @@ const Joi = require('joi');
 // Joi in JavaScript is a library used to validate data — like checking if a user's input is correct before saving it or sending it to the backend.
 
 const bcrypt = require('bcrypt');
-// bcrypt is used to hash passwords so they are stored safely in the database.
+// bcrypt is a library that helps you safely hash and store passwords.
+
+// Think of it like a password lock machine that turns real passwords into random-looking garbage that can’t be reversed.
+
+
 
 
 
@@ -34,9 +38,18 @@ module.exports.registerUser = async function (req, res) {
 
         // Hash the password
         const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
+        //You're generating a random salt.
+        // A salt is just some extra random data added to the password before hashing.
+        // This makes the hash unique, even if two users have the same password.
+        // The 10 means: "Do 10 rounds of work" (more rounds = more secure but slower).
 
-        // Create the user
+
+        const hash = await bcrypt.hash(password, salt);
+        // You're mixing the password + salt, and turning them into a hash.
+        // This hash looks like a random string (e.g., $2b$10$RabcXYZ...)
+
+
+        // Create a user
         await userModel.create({ fullname, email, password: hash });
 
         req.flash('success', 'Account created successfully. You can now log in.');
