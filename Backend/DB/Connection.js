@@ -1,26 +1,57 @@
+
+
+// const connectDB = async () => {
+
+//     try {
+//         const conn = await mongoose.connect(process.env.MONGO_URI);
+
+//         const schema= new mongoose.Schema({
+//             name:String,
+//             age:Number
+//         })
+//         const user=mongoose.model("owners",schema)
+
+//         // Get and print all users with name "taha"
+//         const result = await user.find({name: "taha"});
+//         console.log(result);
+
+
+//         console.log(`MongoDB connected: ${conn.connection.host}`);
+//     } catch (err) {
+//         console.error('MongoDB connection error:', err.message);
+//         process.exit(1); // Exit on failure
+//     }
+// };
+
+// export default connectDB;
+
+
+
 import mongoose from 'mongoose';
+import express from "express";
+const app = express();
+app.use(express.json());
 
-const connectDB = async () => {
-
+async function connectToDatabase() {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        
-        const schema= new mongoose.Schema({
-            name:String,
-            age:Number
-        })
-        const user=mongoose.model("owners",schema)
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
 
-        // Get and print all users with name "taha"
-        const result = await user.find({name: "taha"});
-        console.log(result);
+        // //connection to a specific database in a cluster in mongodb atlas
+        // const usersDB = mongoose.connection.useDb('Game');
 
+        // // Explicitly tell Mongoose to use the 'Users' collection
+        // DisplayName = usersDB.model('DisplayName', displayUsers, 'Users');
 
-        console.log(`MongoDB connected: ${conn.connection.host}`);
+        console.log("✅ MongoDB Connected Successfully");
+
     } catch (err) {
-        console.error('MongoDB connection error:', err.message);
-        process.exit(1); // Exit on failure
+        console.error("❌ MongoDB Connection Error:", err);
+        process.exit(1);
     }
 };
 
-export default connectDB;
+
+export default connectToDatabase;

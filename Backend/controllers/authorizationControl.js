@@ -1,13 +1,17 @@
-const Joi = require('joi');
+import Joi from 'joi';
+
 // Joi in JavaScript is a library used to validate data — like checking if a user's input is correct before saving it or sending it to the backend.
 
-const bcrypt = require('bcrypt');
+import { getUserModel } from '../utils/getUserModel.js';
+
+import bcrypt from 'bcrypt';
+
 // bcrypt is used to hash passwords so they are stored safely in the database.
 
-const userModel = require('../models/user');
-const { generateToken } = require('../utils/generateToken');
+// const userSchema = require('../models/user');
+import { generateToken } from '../utils/generateToken.js';
 
-module.exports.registerUser = async function (req, res) {
+export  async function registerUser(req, res) {
     try {
         let { displayname, username, password } = req.body;
         let user_already = userModel.findOne({ username: username });
@@ -38,9 +42,13 @@ module.exports.registerUser = async function (req, res) {
                 // This hash looks like a random string (e.g., $2b$10$RabcXYZ...)
 
 
+                const UseruserModel = getUserModel('Users');
+
                 // Create a user
-                await userModel.create({ displayname, username, password: hash });
+                await UseruserModel.create({ displayname, username, password: hash });
+
                 //After logging in redirect to main page/
+
                 return res.redirect('/');
             }
         }
@@ -53,31 +61,31 @@ module.exports.registerUser = async function (req, res) {
     }
 }
 
-module.exports.loginUser=async function(req,res){
+export async function loginUser(req, res) {
     try {
-        let {username,password}=req.body;
-        let user1=await userModel.findOne({username:username});
-        if(!user1){
+        let { username, password } = req.body;
+        let user1 = await userModel.findOne({ username: username });
+        if (!user1) {
             console.log("User not found");
         }
-        else{
-            bcrypt.compare(password,user1.password,function(err,result){
-                if(result){
-                    let token=generateToken(user);
+        else {
+            bcrypt.compare(password, user1.password, function (err, result) {
+                if (result) {
+                    let token = generateToken(user);
                     // 👉 Creates a JWT (JSON Web Token) using the user's info
 
-                    res.cookie("token",token);
+                    res.cookie("token", token);
                     // “Store this token in a cookie named token.”
 
                     return res.redirect("/mainpage")
                     // 👉 Redirects to the main page/ after successful login
-                }else{
+                } else {
                     console.log("Invalid password");
                     return res.redirect("/");
                 }
             })
         }
     } catch (error) {
-        
+
     }
 }

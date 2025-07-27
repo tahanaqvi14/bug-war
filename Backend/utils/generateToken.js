@@ -1,9 +1,9 @@
-const jwt=require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 // You’re importing the jsonwebtoken library so you can create and use JWTs (JSON Web Tokens).
 // This tool helps you make secure user tokens.
 
 
-function generateToken(user) {
+export function generateToken(user) {
     // You’re creating a function named generateToken.
     // It takes in a user object after successfull login
 
@@ -30,4 +30,3 @@ function generateToken(user) {
     // "Did I create this token, or was it faked?"
 
 }
-module.exports.generateToken=generateToken
