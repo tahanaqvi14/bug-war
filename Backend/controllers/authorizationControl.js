@@ -8,21 +8,23 @@ import bcrypt from 'bcrypt';
 
 // bcrypt is used to hash passwords so they are stored safely in the database.
 
-// const userSchema = require('../models/user');
+import user from '../models/user.js';  // Reuse the schema you made
 import { generateToken } from '../utils/generateToken.js';
 
 export  async function registerUser(req, res) {
     try {
+        const UseruserModel = getUserModel('Users');
         let { displayname, username, password } = req.body;
-        let user_already = userModel.findOne({ username: username });
+        let user_already = await UseruserModel.findOne({ username: username });
         if (user_already) {
+            console.log(user_already)
             res.send('User already exists');
         } else {
             // Validate input using Joi
-            const userschema = joi.object({
-                displayname: joi.string().min(1).required(),
-                username: joi.string().min(1).required(),
-                password: joi.string().min(8).required()
+            const userschema = Joi.object({
+                displayname: Joi.string().min(1).required(),
+                username: Joi.string().min(1).required(),
+                password: Joi.string().min(8).required()
             })
             const { error } = userschema.validate({ displayname, username, password });
             if (error) {
@@ -42,14 +44,13 @@ export  async function registerUser(req, res) {
                 // This hash looks like a random string (e.g., $2b$10$RabcXYZ...)
 
 
-                const UseruserModel = getUserModel('Users');
 
                 // Create a user
                 await UseruserModel.create({ displayname, username, password: hash });
 
                 //After logging in redirect to main page/
 
-                return res.redirect('/');
+                return res.send('user created');
             }
         }
 

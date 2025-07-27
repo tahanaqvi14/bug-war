@@ -28,5 +28,4 @@ export function generateToken(user) {
     // It’s used to sign and protect the token.
     // Think of it like a digital seal or signature — so the server can later check:
     // "Did I create this token, or was it faked?"
-
 }
