@@ -37,35 +37,36 @@ export  async function registerUser(req, res) {
                 // A salt is just some extra random data added to the password before hashing.
                 // This makes the hash unique, even if two users have the same password.
                 // The 10 means: "Do 10 rounds of work" (more rounds = more secure but slower).
-
+                
 
                 const hash = await bcrypt.hash(password, salt);
                 // You're mixing the password + salt, and turning them into a hash.
                 // This hash looks like a random string (e.g., $2b$10$RabcXYZ...)
-
-
-
+                
+                
+                
                 // Create a user
                 await UseruserModel.create({ displayname, username, password: hash });
-
+                
                 //After logging in redirect to main page/
-
+                
                 return res.send('user created');
             }
         }
-
+        
     } catch (error) {
         console.error(error);
         //If there's an error, redirect to login page laikin koi error dikhana zaroor
         return res.redirect('/');
-
+        
     }
 }
 
 export async function loginUser(req, res) {
     try {
+        const UseruserModel = getUserModel('Users');
         let { username, password } = req.body;
-        let user1 = await userModel.findOne({ username: username });
+        let user1 = await UseruserModel.findOne({ username: username });
         if (!user1) {
             console.log("User not found");
         }
@@ -78,7 +79,8 @@ export async function loginUser(req, res) {
                     res.cookie("token", token);
                     // “Store this token in a cookie named token.”
 
-                    return res.redirect("/mainpage")
+                    // return res.redirect("/mainpage")
+                    return res.send("u have logged-in")
                     // 👉 Redirects to the main page/ after successful login
                 } else {
                     console.log("Invalid password");
