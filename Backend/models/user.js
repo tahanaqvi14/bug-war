@@ -21,11 +21,27 @@ const user=mongoose.Schema({
         
         trim:true,//Removes leading/trailing whitespace automatically before saving.
     },
-    points:Number,
-    sub_name:String,
-    challenges_completed:String,
-    totalWins:Number,
-    total_matches:Number
+    points: {
+        type: Number,
+        default: 0
+    },
+    sub_name: {
+        type: String,
+        default: 'Rookie'
+    },
+    challenges_completed: {
+        type: [String], // or Number if just a count
+        default: []
+    },
+    totalWins: {
+        type: Number,
+        default: 0
+    },
+    total_matches: {
+        type: Number,
+        default: 0
+    }
+
 
 })
 // const User = mongoose.model('User', userSchema);

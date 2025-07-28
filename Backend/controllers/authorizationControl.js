@@ -46,7 +46,7 @@ export  async function registerUser(req, res) {
                 
                 
                 // Create a user
-                await UseruserModel.create({ displayname, username, password: hash });
+                await UseruserModel.create({ displayname, username, password: hash});
                 
                 //After logging in redirect to main page/
                 
@@ -61,6 +61,8 @@ export  async function registerUser(req, res) {
         
     }
 }
+
+
 
 export async function loginUser(req, res) {
     try {

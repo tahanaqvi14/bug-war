@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 
 // utils/getUserModel.js
 
-
 import user from '../models/user.js';  // Reuse the schema you made
 
 // This object remembers created models (to avoid errors or duplicate models)
