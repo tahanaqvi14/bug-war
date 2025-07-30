@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desert Coding Race</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sand-light: #F5DEB3;
+            --sand-dark: #D2B48C;
+            --rust: #B7410E;
+            --cactus-green: #556B2F;
+            --dusk-blue: #36454F;
+            --sun-yellow: #F4A460;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            background: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cb4a4a64-2ec3-40c8-a951-5844e260886d.png') center/cover fixed;
+            color: #333;
+        }
+
+        .race-bar {
+
+            background: linear-gradient(to right, rgba(210, 180, 140, 0.7), rgba(183, 65, 14, 0.5));
+            backdrop-filter: blur(5px);
+            margin:20px 20px;
+            border: 2px ridge #B7410E;
+            border-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c21a201b-cce2-4075-b78d-b37c5c8a6f0d.png') 30 stretch;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px ridge var(--sand-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .countdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .countdown-clock {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--sun-yellow);
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(244, 164, 96, 0.7);
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid var(--sand-light);
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: black;
+            margin-top: 3px;
+        }
+
+        .players-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 5px;
+            scrollbar-width: none;
+        }
+
+        .players-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .player-card {
+            background: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/859134fc-1215-4676-b124-d5b63e3f6281.png') center/cover;
+            background-blend-mode: overlay;
+            background-color: rgba(245, 222, 179, 0.8);
+            border-radius: 8px;
+            padding: 8px 12px;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 
+                2px 2px 5px rgba(0, 0, 0, 0.2),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--rust);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-card::after {
+            content: '🏜️';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            font-size: 16px;
+            text-align: center;
+            background: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .position-badge {
+            background-color: var(--rust);
+            color: white;
+            font-weight: bold;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .position-1 {
+            background: linear-gradient(145deg, #FFD700, #DAA520);
+            color: black;
+        }
+
+        .position-2 {
+            background: linear-gradient(145deg, #C0C0C0, #A9A9A9);
+            color: black;
+        }
+
+        .position-3 {
+            background: linear-gradient(145deg, #CD7F32, #A0522D);
+            color: black;
+        }
+
+        .player-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--dusk-blue);
+            background-color: var(--cactus-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.8rem;
+            overflow: hidden;
+        }
+
+        .player-avatar img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .player-name {
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--dusk-blue);
+        }
+
+        .player-status {
+            font-size: 0.7rem;
+            color: var(--rust);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .race-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .countdown-container {
+                margin-bottom: 10px;
+            }
+            
+            .players-container {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="race-bar">
+        <div class="countdown-container">
+            <div class="countdown-clock" id="countdown">05:23</div>
+            <div class="countdown-label">Time Remaining</div>
+        </div>
+        
+        <div class="players-container">
+            <!-- Player 1 -->
+            <div class="player-card">
+                <div class="position-badge position-1">1</div>
+                <div class="player-avatar">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ace8e68e-37f9-48bf-8981-92f557ab2094.png" alt="Pixel art desert fox with goggles and headscarf" />
+                </div>
+                <div class="player-info">
+                    <div class="player-name">DesertCoder</div>
+                    <div class="player-status"><i class="fas fa-bolt"></i> 42 lines</div>
+                </div>
+            </div>
+            
+            <!-- Player 2 -->
+            <div class="player-card">
+                <div class="position-badge position-2">2</div>
+                <div class="player-avatar">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/04ae0227-2350-4905-ad18-23411dcc3018.png" alt="Pixel art coyote with sunglasses and earphones" />
+                </div>
+                <div class="player-info">
+                    <div class="player-name">CodeCoyote</div>
+                    <div class="player-status"><i class="fas fa-code"></i> 38 lines</div>
+                </div>
+            </div>
+            
+            <!-- Player 3 -->
+            <div class="player-card">
+                <div class="position-badge position-3">3</div>
+                <div class="player-avatar">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/71f3cad1-06cf-4caf-ae21-4512bfe8fd24.png" alt="Pixel art vulture with racing helmet and keyboard" />
+                </div>
+                <div class="player-info">
+                    <div class="player-name">VultureDev</div>
+                    <div class="player-status"><i class="fas fa-terminal"></i> 35 lines</div>
+                </div>
+            </div>
+            
+            <!-- Player 4 -->
+            <div class="player-card">
+                <div class="position-badge">4</div>
+                <div class="player-avatar">JS</div>
+                <div class="player-info">
+                    <div class="player-name">JSRacer</div>
+                    <div class="player-status"><i class="fas fa-spinner"></i> 28 lines</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Countdown timer functionality
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            let seconds = 323; // 5 minutes and 23 seconds for demo
+            
+            function tick() {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                countdownElement.textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                
+                if (seconds > 0) {
+                    seconds--;
+                    setTimeout(tick, 1000);
+                } else {
+                    countdownElement.textContent = "00:00";
+                    countdownElement.style.color = "#FF0000";
+                }
+            }
+            
+            tick();
+        }
+        
+        // Initialize the countdown when the page loads
+        window.onload = updateCountdown;
+    </script>
+</body>
+</html>
+

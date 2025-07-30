@@ -5,7 +5,9 @@ import Secondpage from './page2/Secondpage';
 
 
 const App = () => {
-  <Secondpage/>
+  return (
+    <Secondpage/>
+  );
 }
 
-export default App
+export default App;

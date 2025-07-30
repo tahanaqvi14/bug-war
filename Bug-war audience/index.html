@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waving Arm Behind Body</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+        margin: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .person {
+      position: relative;
+      width: 80px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .head {
+      width: 40px;
+      height: 40px;
+      background-color: #FFD399;
+      border-radius: 50%;
+      position: relative;
+      z-index: 4;
+    }
+
+    .body {
+      width: 35px;
+      height: 45px;
+      background-color: #4CAF50;
+      border-radius: 10px 10px 0 0;
+      position: relative;
+      top: -10px;
+      z-index: 3; /* Ensure it is above arms */
+    }
+
+    .arm-container {
+      z-index: 1; /* Behind the body */
+      display: flex;
+      justify-content: space-between;
+      width: 40px;
+      position: absolute;
+      top: 45px; /* Positioned below the head */
+    }
+
+    .arm {
+      width: 8px;
+      height: 35px;
+      background-color: #FFD399;
+      border-radius: 4px;
+    }
+
+    .arm.left-arm {
+      transform-origin: top right;
+      transform: rotate(100deg);
+    }
+    .arm.right-arm {
+      transform-origin: top left;
+      transform: rotate(-100deg);
+    }
+
+    .leg-container {
+      display: flex;
+      justify-content: space-between;
+      width: 25px;
+      position: relative;
+      top: -10px;
+      z-index: 2;
+    }
+
+    .leg {
+      width: 10px;
+      height: 35px;
+      background-color: #287233;
+      border-radius: 0 0 4px 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="person">
+      <div class="head"></div>
+
+      <!-- Arms moved outside body and behind it -->
+      <div class="arm-container">
+        <div id="rotate-me" class="arm left-arm"></div>
+        <div id="rotate-me1" class="arm right-arm"></div>
+      </div>
+
+      <div class="body"></div>
+
+      <div class="leg-container">
+        <div class="leg left-leg"></div>
+        <div class="leg right-leg"></div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="person">
+      <div class="head"></div>
+
+      <!-- Arms moved outside body and behind it -->
+      <div class="arm-container">
+        <div id="rotate-me" class="arm left-arm"></div>
+        <div id="rotate-me1" class="arm right-arm"></div>
+      </div>
+
+      <div class="body"></div>
+
+      <div class="leg-container">
+        <div class="leg left-leg"></div>
+        <div class="leg right-leg"></div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="person">
+      <div class="head"></div>
+
+      <!-- Arms moved outside body and behind it -->
+      <div class="arm-container">
+        <div id="rotate-me" class="arm left-arm"></div>
+        <div id="rotate-me1" class="arm right-arm"></div>
+      </div>
+
+      <div class="body"></div>
+
+      <div class="leg-container">
+        <div class="leg left-leg"></div>
+        <div class="leg right-leg"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    gsap.to("#rotate-me", {
+      rotate: 115,
+      transformOrigin: "top right",
+      duration: 0.6,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut"
+    });
+    gsap.to("#rotate-me1", {
+      rotate: -115,
+      transformOrigin: "top left",
+      duration: 0.6,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut"
+    });
+  </script>
+</body>
+
+</html>

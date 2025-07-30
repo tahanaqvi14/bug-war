@@ -81,6 +81,13 @@ export async function loginUser(req, res) {
                     res.cookie("token", token);
                     // “Store this token in a cookie named token.”
 
+                    req.session.user = {
+                        username: user1.username
+                      };
+                      
+                      console.log(req.session.user.username)
+                      
+                      
                     // return res.redirect("/mainpage")
                     return res.send("u have logged-in")
                     // 👉 Redirects to the main page/ after successful login
