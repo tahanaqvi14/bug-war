@@ -37,13 +37,12 @@ const resolvers = {
                 
                 const username = fetchedinfo.username;
                 // console.log(username)
-                
+
                 const username_available = await UserModel.findOne({ username:username }); // FIX: await
-                // const username_available = await UserModel.find(); // FIX: await
                 console.log(username_available)
                 if (username_available!=null) {
                     const user_all_detail = await Authenticator(fetchedinfo);
-    
+
                     await UserModel.create({
                         displayname: user_all_detail.displayname,
                         username: user_all_detail.username,

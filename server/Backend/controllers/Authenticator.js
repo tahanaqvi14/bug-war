@@ -6,14 +6,28 @@ const Authenticator = async (input) => {
 
   // Validate input using Joi
   const userSchema = Joi.object({
-    displayname: Joi.string().min(1).required(),
-    username: Joi.string().min(1).required(),
-    password: Joi.string().min(8).required(),
+    displayname: Joi.string().min(3).max(10).required().messages({
+      'string.max': 'Display name must be at most 10 characters',
+      'string.min': 'Display name must be at least 3 characters',
+      'any.required': 'Display name is required'
+    }),
+
+    username: Joi.string().min(4).max(12).required().messages({
+      'string.max': 'Username must be at most 12 characters',
+      'string.min': 'Username must be at least 4 characters',
+      'any.required': 'Username is required'
+    }),
+
+    password: Joi.string().min(8).max(20).required().messages({
+      'string.max': 'Password must be at most 20 characters',
+      'string.min': 'Password must be at least 8 characters',
+      'any.required': 'Password is required'
+    }),
   });
 
   const { error } = userSchema.validate({ displayname, username, password });
   if (error) {
-    throw new Error('Please fill out the fields correctly: ' + error.message);
+    throw new Error(error.message);
   }
 
   // Hash the password
