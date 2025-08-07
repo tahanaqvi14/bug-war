@@ -1,0 +1,11 @@
+import express from 'express';
+const router=express.Router()
+
+
+router.get('/', function(req, res){
+    res.send('404');
+});
+
+
+
+export default router;
