@@ -1,6 +1,6 @@
-import Authenticator from '../../controllers/Authenticator'; // FIX: correct relative import
+import Authenticator from '../../controllers/Authenticator.js'; // FIX: correct relative import
 import { getUserModel } from '../../utils/getUserModel.js'; // FIX: correct relative import
-import isloggedin from "../../middleware/isloggedIn"
+import isloggedin from "../../middleware/isloggedIn.js"
 
 const resolvers = {
     Query: {
@@ -26,31 +26,49 @@ const resolvers = {
     },
 
     Mutation: {
-        CreateUser: async (parent, args) => {
+        user_creation: async (parent, args) => {
             try {
                 const UserModel = getUserModel('Users');
+                console.log(UserModel)
                 const fetchedinfo = args.input;
-                const { username } = fetchedinfo;
 
-                const username_available = await UserModel.findOne({ username }); // FIX: await
-                if (username_available) {
-                    throw new Error('User already exists');
+                
+                
+                
+                const username = fetchedinfo.username;
+                // console.log(username)
+                
+                const username_available = await UserModel.findOne({ username:username }); // FIX: await
+                // const username_available = await UserModel.find(); // FIX: await
+                console.log(username_available)
+                if (username_available!=null) {
+                    const user_all_detail = await Authenticator(fetchedinfo);
+    
+                    await UserModel.create({
+                        displayname: user_all_detail.displayname,
+                        username: user_all_detail.username,
+                        password: user_all_detail.hash
+                    });
+    
+                    return {
+                        success: true,
+                        message: 'User created successfully'
+                    };
+
+                }else{
+                    return {
+                        success: false,
+                        message: `Username taken`
+                    }
                 }
-
-                const user_all_detail = await Authenticator(fetchedinfo);
-
-                await UserModel.create({
-                    displayname: user_all_detail.displayname,
-                    username: user_all_detail.username,
-                    password: user_all_detail.hash
-                });
-
-                return {
-                    success: true,
-                    message: 'User created successfully'
-                };
+                
             } catch (error) {
-                throw new Error(`Failed to create user: ${error.message}`);
+                return {
+                    success: false,
+                    message: `Failed to create user: ${error.message}`
+                }
+                // throw new Error(`Failed to create user: ${error.message}`);
+
             }
         },
 
@@ -87,4 +105,4 @@ const resolvers = {
     }
 };
 
-export { resolvers }; // ✅ modern ES module syntax
+export default resolvers;

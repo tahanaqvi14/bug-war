@@ -1,4 +1,4 @@
-import express  from 'express';
+import express from 'express';
 import dotenv from 'dotenv';// Load variables from .env
 import connectDB from './DB/Connection.js'
 import cookieParser from 'cookie-parser';
@@ -6,22 +6,27 @@ import { RedisStore } from 'connect-redis';
 import { createClient } from 'redis';
 import expressSession from 'express-session';
 import usersRoute from './routes/usersRouter.js';
+import typeDefs from './models/user-type-def.js'
+import resolvers from './models/User/user-resolvers.js'
 
+import { expressMiddleware } from '@as-integrations/express4';
 
-import { expressMiddleware } from '@apollo/server/express4';
 // ✅ What expressMiddleware gives you:
 // Single server (app.listen(...)) for REST and GraphQL
 // Shared session/cookie/auth logic
-import ApolloServer  from 'apollo-server';
+import { ApolloServer } from '@apollo/server';
+import cors from 'cors';
+
+
 
 
 
 // so when user login so session is stored in server & session id is given to cookie and store in browser, when i open a anther page so cookie sent session to server to confirm the info.
 
 
-const apolloserver = new ApolloServer({ typeDefs, resolvers});
+const apolloserver = new ApolloServer({ typeDefs, resolvers });
 
-await apolloServer.start();
+await apolloserver.start();
 
 
 dotenv.config();
@@ -30,45 +35,45 @@ connectDB();
 
 app.use(
   expressSession({
-      secret: process.env.EXPRESS_SESSION_SECRET,
-      resave: false,
-//       What it means: "Only save the session if something changed"
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    resave: false,
+    //       What it means: "Only save the session if something changed"
 
-        // Why set to false:
+    // Why set to false:
 
-        // Better performance (avoids unnecessary saves)
+    // Better performance (avoids unnecessary saves)
 
-        // Prevents race conditions (multiple writes for same session)
+    // Prevents race conditions (multiple writes for same session)
 
-        // What happens if true:
+    // What happens if true:
 
-        // Saves session to store on every request (wastes resources)
+    // Saves session to store on every request (wastes resources)
 
 
-      saveUninitialized: false,
-      // What it means: "Don't save empty sessions"
+    saveUninitialized: false,
+    // What it means: "Don't save empty sessions"
 
-      // Why set to false:
-      
-      // Complies with privacy laws (GDPR)
-      
-      // Saves storage space
-      
-      // Prevents session flooding attacks
-      
-      // When it saves: Only when you modify req.session (e.g., req.session.user = ...)
+    // Why set to false:
 
-  
+    // Complies with privacy laws (GDPR)
+
+    // Saves storage space
+
+    // Prevents session flooding attacks
+
+    // When it saves: Only when you modify req.session (e.g., req.session.user = ...)
+
+
     // cookie settings
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // Session expires in 1 day (optional)
-      secure: process.env.NODE_ENV === 'development', 
+      secure: process.env.NODE_ENV === 'development',
       // The cookie will only be sent if you're using a secure HTTPS connection (with the 🔒 lock in the browser
       // if secure value is false so Cookie will work on http:// too (like localhost)
       // if secure value is true so Cookie will only work on https:// (with the 🔒 lock in the browser) which means it will be used only on production server
       // in this case we have set NODE_ENV in .env file as production so this will be FALSE as we are using in development mode & when it is production ready so we will set it to TRUE.
 
-      
+
       httpOnly: true,  // Blocks JavaScript cookie access (XSS protection)
       // When you use cookies in web apps (like when someone logs in), the browser stores a cookie — usually holding a session ID. That session ID is how your app remembers who the user is.
       //setting it true will block JavaScript from accessing the cookie, which helps protect against cross-site scripting (XSS) attacks.
@@ -77,13 +82,13 @@ app.use(
 
       // What is XSS?
       // A hacker manages to inject their own malicious JavaScript into your webpage (maybe through a comment box or form).
-      
+
       // That JavaScript could try to do: "document.cookie"
       // to steal the user's session cookie.
       // If that cookie holds the session ID, the hacker can pretend to be that user and access their account.
-      
+
       //by setting it to true the cookie is invisble.
-      
+
 
 
       sameSite: 'lax'  // Prevents CSRF attacks (use 'strict' for sensitive apps)
@@ -115,13 +120,18 @@ app.use(
   })
 );
 
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 app.use(express.json());
 // It lets your server understand JSON in the request body.
 //Think of it like a JSON translator between client and server.
 //enable to read data from {req.body}
 // for APIs
 
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 // Lets your server read form data from <form> submissions (like from login/signup pages).
 //If extended: false: only allows simple objects
 // If extended: true: allows nested objects (like user[name]=sarthak)
@@ -135,7 +145,7 @@ app.use(cookieParser())
 // app.use(express.static(path.join(__dirname,'public')))
 // Tells Express: “Anything inside /public folder is available to the browser.
 
-app.use('/',usersRoute);
+app.use('/', usersRoute);
 // This tells your server: “Whenever someone visits any URL that starts with /, use the usersRoute file to decide what to do.”
 
 
@@ -144,12 +154,12 @@ app.use('/',usersRoute);
 // "When a request comes to / , Apollo Server will take over and respond to it."
 
 
-app.use('/', expressMiddleware(apolloServer, {
+app.use('/graphql', expressMiddleware(apolloserver, {
   context: async ({ req }) => {
-  // This part builds a contex object that will be passed to all your GraphQL resolvers (the functions that return data).
-  // Inside here, you can access:
-  // req — the incoming request (includes headers, session, cookies, etc.)
-    return {  req,user: req.session?.user };
+    // This part builds a contex object that will be passed to all your GraphQL resolvers (the functions that return data).
+    // Inside here, you can access:
+    // req — the incoming request (includes headers, session, cookies, etc.)
+    return { req, user: req.session?.user };
     // If the session exists, get the user from it. If not, return undefined.”
   },
 }));

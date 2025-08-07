@@ -1,4 +1,5 @@
-const { gql } = require("apollo-server")
+import { gql } from 'graphql-tag';
+
 
 const typeDefs = gql`
     type user{
@@ -13,7 +14,7 @@ const typeDefs = gql`
     }
     type Query {
         LeaderBoard_Info: [user!]!
-
+        FindUserForProfile:user
 
     }
     input createuser{
@@ -33,9 +34,8 @@ const typeDefs = gql`
 
 
     type Mutation{
-        CreateUser(input:createuser!):CreateUserResponse!
+        user_creation(input:createuser!):CreateUserResponse!
         Update(input:updateuser):user
     }
 `
-
-module.exports = { typeDefs }
+export default typeDefs;

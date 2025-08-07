@@ -1,8 +1,7 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 // Imports the jsonwebtoken library to verify tokens.
-const userModel = require('../models/user');
+import userModel from '../models/user.js';
 //accessing the user's info from the database
-
 
 
 
