@@ -1,6 +1,5 @@
 import { gql } from 'graphql-tag';
 
-
 const typeDefs = gql`
     type user{
         displayname:String!
@@ -12,19 +11,11 @@ const typeDefs = gql`
         totalWins:Int
         total_matches:Int
     }
+
     type Query {
         LeaderBoard_Info: [user!]!
         FindUserForProfile:user
 
-    }
-    input createuser{
-        displayname:String!
-        username:ID!
-        password:String!
-    }
-    input updateuser{
-        newdisplayname:String!
-        newpassword:String!
     }
 
     type CreateUserResponse {
@@ -32,9 +23,25 @@ const typeDefs = gql`
         message: String!
     }
 
+    input createuser{
+        displayname:String!
+        username:ID!
+        password:String!
+    }
+
+    input loginuser{
+        username:ID!
+        password:String!
+    }
+
+    input updateuser{
+        newdisplayname:String!
+        newpassword:String!
+    }
 
     type Mutation{
         user_creation(input:createuser!):CreateUserResponse!
+        user_login(input:loginuser!):CreateUserResponse!
         Update(input:updateuser):user
     }
 `

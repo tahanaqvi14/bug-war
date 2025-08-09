@@ -155,11 +155,12 @@ app.use('/', usersRoute);
 
 
 app.use('/graphql', expressMiddleware(apolloserver, {
-  context: async ({ req }) => {
+  context: async ({ req,res }) => {
     // This part builds a contex object that will be passed to all your GraphQL resolvers (the functions that return data).
     // Inside here, you can access:
     // req — the incoming request (includes headers, session, cookies, etc.)
-    return { req, user: req.session?.user };
+    // return { req, user: req.session?.user };
+    return { req,res };
     // If the session exists, get the user from it. If not, return undefined.”
   },
 }));
