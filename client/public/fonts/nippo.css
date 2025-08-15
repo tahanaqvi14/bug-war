@@ -1,0 +1,96 @@
+/**
+* @license
+*
+* Font Family: Nippo
+* Designed by: Manushi Parikh
+* URL: https://www.fontshare.com/fonts/nippo
+* © 2025 Indian Type Foundry
+*
+* Nippo Extralight 
+* Nippo Light 
+* Nippo Regular 
+* Nippo Medium 
+* Nippo Bold 
+* Nippo Variable (Variable font)
+
+*
+*/
+/* @font-face {
+  font-family: 'Nippo-Extralight';
+  src: url('./Nippo-Extralight.woff2') format('woff2'),
+       url('Nippo-Extralight.woff') format('woff'),
+       url('Nippo-Extralight.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Nippo-Light';
+  src: url('Nippo-Light.woff2') format('woff2'),
+       url('Nippo-Light.woff') format('woff'),
+       url('Nippo-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Nippo-Regular';
+  src: url('Nippo-Regular.woff2') format('woff2'),
+       url('Nippo-Regular.woff') format('woff'),
+       url('Nippo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Nippo-Medium';
+  src: url('Nippo-Medium.woff2') format('woff2'),
+       url('Nippo-Medium.woff') format('woff'),
+       url('Nippo-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Nippo-Bold';
+  src: url('Nippo-Bold.woff2') format('woff2'),
+       url('Nippo-Bold.woff') format('woff'),
+       url('Nippo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+} */
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 700.0;
+*
+* available axes:
+'wght' (range from 200.0 to 700.0
+*/
+/* @font-face {
+  font-family: 'Nippo-Variable';
+  src: url('Nippo-Variable.woff2') format('woff2'),
+       url('Nippo-Variable.woff') format('woff'),
+       url('Nippo-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+ */
+
+ @font-face {
+  font-family: 'Nippo';
+  src: url('Nippo-Regular.woff2') format('woff2'),
+       url('Nippo-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Nippo';
+  src: url('Nippo-Bold.woff2') format('woff2'),
+       url('Nippo-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}

@@ -1,0 +1,79 @@
+Alright — here’s a clean breakdown you can use for your document.
+
+## **Issue: Socket.IO Session Mismatch After Login**
+
+### **Problem**
+
+The socket connection was being created **immediately** when the React app loaded:
+
+const socket = io('http://localhost:1509', { withCredentials: true });
+
+This happened **before** the user logged in.
+
+As a result:
+
+* **Socket session A** was created first — it had **no `user` data** in the session and an earlier `_expires` time.
+* **HTTP session B** (created at login) had the `user` data and a later `_expires` time.
+* Because sessions were created at different times, expiry times didn’t match and socket didn’t have the user info.
+
+---
+
+### **Cause**
+
+* The socket handshake happens at the moment `io()` is called.
+* If you call `io()` before login, the browser has no session cookie yet, so the server can’t attach `user` data to that socket’s session.
+* Socket.IO won’t magically update its session data just because you logged in later — you must reconnect to send the updated cookie.
+
+---
+
+### **Solution**
+
+**Create the socket only after a successful login**, so the handshake uses the same session and cookie as the HTTP login.
+
+**Steps:**
+
+1. Remove the top-level socket creation from `App.js`.
+2. Create a `connectSocket()` function in `App.js` that calls `io()` only when needed.
+3. Call `connectSocket()` **after** login success in `Login.js`.
+4. Store the socket in React Context so it’s shared across the whole app.
+
+---
+
+**Example Fix:**
+
+**App.js**
+
+```jsx
+const [socket, setSocket] = useState(null);
+
+const connectSocket = () => {
+  if (!socket) {
+    const newSocket = io('http://localhost:1509', { withCredentials: true });
+    setSocket(newSocket);
+  }
+};
+
+<Route path="/" element={<Login connectSocket={connectSocket} />} />
+```
+
+**Login.js**
+
+```jsx
+if (res.ok) {
+  connectSocket(); // Connect socket AFTER login success
+  navigate('/page2');
+}
+```
+
+---
+
+### **Result**
+
+* Both HTTP and Socket.IO now share the same session and expiry.
+* `req.session.user` is available inside both HTTP routes and Socket.IO event handlers immediately after login.
+* No duplicate sessions, no mismatched `_expires`.
+
+---
+
+I can also add a **timeline diagram** to your document so the “before vs after” is super clear.
+Do you want me to make that?
