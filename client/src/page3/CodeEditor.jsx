@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './css/game.css';
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql,useLazyQuery } from "@apollo/client";
 
 const GET_CHALLENGE = gql`
   query Get_challenge {
@@ -10,20 +10,24 @@ const GET_CHALLENGE = gql`
     }
   }
 `;
+const GET_RESULT_OF_CODE = gql`
+    query checking_user_code($input: checking_code!){
+        checking_user_code(input:$input){
+            success
+            message
+        }
+    }
+`
 
 
 const CodeEditor = () => {
-  const { data, loading, error, refetch } = useQuery(GET_CHALLENGE);
+  const { data:challenge_data, loading:challenge_loading, error:challenge_error } = useQuery(GET_CHALLENGE);
+  const [getcode,{ data:result_data, loading:result_loading, error:result_error }] = useLazyQuery(GET_RESULT_OF_CODE);
+
   const containerRef = useRef(null);
   const editorRef = useRef(null);
 
-  const [code, setCode] = useState("");
-
-  // when data loads, update code
-  useEffect(() => {
-
-  }, []);
-
+  const [code, setCode] = useState("//write code here");
 
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
@@ -47,7 +51,7 @@ const CodeEditor = () => {
 
         window.require(["vs/editor/editor.main"], () => {
           editorRef.current = window.monaco.editor.create(containerRef.current, {
-            value: "loading...",
+            value: code,
             language: "javascript",
             theme: "vs-dark",
             fontFamily: "Fira Code, monospace",
@@ -79,43 +83,40 @@ const CodeEditor = () => {
   }, []);
 
   useEffect(() => {
-    if (loading && editorRef.current) {
+    if (challenge_loading && editorRef.current) {
       editorRef.current.setValue("loading...");
-    } else if (data && editorRef.current) {
-      editorRef.current.setValue(`function ${data.Get_challenge[0].function_name}(){ 
+    } else if (challenge_data && editorRef.current) {
+      editorRef.current.setValue(`function ${challenge_data.Get_challenge[0].function_name}(){ 
     // Write your function inside this
   }\n`);
     }
-  }, [loading, data]);
+  }, [challenge_loading, challenge_data]);
 
   const runCode = async (actionType) => {
     const code = editorRef.current.getValue();
     setIsRunning(true);
+
     setRunningAction(actionType); // ✅ track which button was clicked
 
     try {
-      const response = await fetch('http://localhost:3000/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-
-      const data = await response.json();;
-      if (data.error) {
-        setOutput('Error: ' + data.error);
-      } else if (data.results) {
-        let resultText = '';
-        data.results.forEach((r, idx) => {
-          resultText += `Test Case ${idx + 1}:`;
-          resultText += `Input: [${r.input.join(', ')}]`;
-          resultText += `Expected: ${r.expected}, Got: ${r.output}`;
-          resultText += r.passed ? '✅ Passed\n\n' : '❌ Failed\n\n';
-        });
-        if (data.logs.length > 0) {
-          resultText += 'Console Logs:\n' + data.logs.join('\n');
-        }
-        setOutput(resultText);
-      }
+      console.log(code)
+      const data=await getcode({ variables: { input: { code:code } } });
+      console.log(data);
+      // if (data.error) {
+      //   setOutput('Error: ' + data.error);
+      // } else if (data.results) {
+      //   let resultText = '';
+      //   data.results.forEach((r, idx) => {
+      //     resultText += `Test Case ${idx + 1}:`;
+      //     resultText += `Input: [${r.input.join(', ')}]`;
+      //     resultText += `Expected: ${r.expected}, Got: ${r.output}`;
+      //     resultText += r.passed ? '✅ Passed\n\n' : '❌ Failed\n\n';
+      //   });
+      //   if (data.logs.length > 0) {
+      //     resultText += 'Console Logs:\n' + data.logs.join('\n');
+      //   }
+      //   setOutput(resultText);
+      // }
     } catch (err) {
       setOutput('Fetch error: ' + err.message);
     } finally {
@@ -125,7 +126,7 @@ const CodeEditor = () => {
   };
 
   const handleReset = () => {
-    const initialCode = `function ${data.Get_challenge[0].function_name}(){
+    const initialCode = `function ${challenge_data.Get_challenge[0].function_name}(){
   //Write your function inside this
 }\n`;
     setCode(initialCode);
@@ -138,17 +139,17 @@ const CodeEditor = () => {
         <div className="max-w-4xl mx-auto">
           <h2 className="font-semibold text-2xl mb-3">Problem Statement</h2>
           <p className="mb-4 text-sm leading-relaxed">
-            {loading
+            {challenge_loading
               ? "Loading..."
-              : data
-                ? data.Get_challenge[0].problem_statement
+              : challenge_data
+                ? challenge_data.Get_challenge[0].problem_statement
                 : "Error or no data"}
           </p>
           <p className="mb-4 text-sm leading-relaxed">
-            {loading
+            {challenge_loading
               ? "Loading..."
-              : data
-                ? 'Make sure to wrap your code in ' + data.Get_challenge[0].function_name + ' function'
+              : challenge_data
+                ? 'Make sure to wrap your code in ' + challenge_data.Get_challenge[0].function_name + ' function'
                 : "Error or no data"}
           </p>
           {/* <p>Make sure to wrap your code in {data.Get_challenge[0].} funtion </p> */}
