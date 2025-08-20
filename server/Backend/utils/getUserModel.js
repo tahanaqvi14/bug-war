@@ -1,8 +1,14 @@
 import mongoose from 'mongoose'
 
 // utils/getUserModel.js
+import userSchema from '../models/user.js';
+import challengeSchema from '../models/challenge.js';
 
-import user from '../models/user.js';  // Reuse the schema you made
+
+const schemaMap = {
+  Users: userSchema,
+  Challenges: challengeSchema,
+};
 
 // This object remembers created models (to avoid errors or duplicate models)
 const modelCache = {};
@@ -14,7 +20,7 @@ export function getUserModel(collectionName) {
   if (!modelCache[collectionName]) {
     modelCache[collectionName] = usersDB.model(
       collectionName,       // Name of the model
-      user,           // The schema you're using
+      schemaMap[collectionName],           // The schema you're using
       collectionName        // Name of the actual collection in MongoDB
     );
   }

@@ -1,50 +1,44 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { SocketContext } from '../App';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useQuery, gql } from "@apollo/client";
+
+const GET_CHALLENGE = gql`
+  query Get_challenge {
+    Get_challenge {
+      function_name
+      problem_statement
+    }
+  }
+`;
 
 const Gamingpage = () => {
-  const socket = useContext(SocketContext);
-  const navigate = useNavigate();
-  const [players, setPlayers] = useState([]);
+  const { data, loading, error, refetch } = useQuery(GET_CHALLENGE);
 
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on('Gaming_screen', (data) => {
-      console.log('Received from server:', data);
-      if (data.playerData) {
-        setPlayers(data.playerData); // store the array
-      }
-    });
-
-    socket.on('end_for_all',()=>{
-      document.getElementById('info').innerHTML=`game over`
-    })
-
-  }, [socket]);
-
-
-  const handleMoveForward = () => {
-    socket.emit('move_forward');
-  };
-
-
+  if (loading) return <p>Loading challenge...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  // if (!data || !data.Get_challenge)
+  //   return <p>No challenge available right now</p>;
+  if(data){
+    console.log(data)
+  }
   return (
-    <div>
-      <div id='info'>
+    <div style={{ padding: "1rem" }}>
+      {/* <h2>{data.Get_challenge.function_name}</h2>
+      <p>{data.Get_challenge.problem_statement}</p> */}
 
-      {players.length === 0 ? (
-        <p>wait...</p>
-      ) : (
-        players.map((p, i) => (
-          <p key={i}>
-            {p.username}: {p.score}
-          </p>
-        ))
-      )}
-      </div>
-
-      <button onClick={handleMoveForward}> click me to increment</button>
+      {/* <button
+        style={{
+          marginTop: "1rem",
+          padding: "0.5rem 1rem",
+          borderRadius: "6px",
+          backgroundColor: "#f4b24a",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+        onClick={() => refetch()}
+      >
+        Next Challenge
+      </button> */}
     </div>
   );
 };

@@ -2,11 +2,17 @@ import express from 'express';
 import dotenv from 'dotenv';// Load variables from .env
 import connectDB from './DB/Connection.js'
 import cookieParser from 'cookie-parser';
-import { RedisStore } from 'connect-redis';
-import { createClient } from 'redis';
+// import { RedisStore } from 'connect-redis';
+// import { createClient } from 'redis';
 import expressSession from 'express-session';
-import typeDefs from './models/user-type-def.js'
-import resolvers from './models/User/user-resolvers.js'
+import usertypeDefs from './models/user-type-def.js'
+import challenge_typeDefs from './models/challenge-type-def.js'
+import challenge_resolvers from './models/Challenges/challenge-resolvers.js'
+import userresolvers from './models/User/user-resolvers.js'
+import { mergeTypeDefs } from '@graphql-tools/merge';
+import { mergeResolvers } from '@graphql-tools/merge';
+
+
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { expressMiddleware } from '@as-integrations/express4';
@@ -18,7 +24,15 @@ import { ApolloServer } from '@apollo/server';
 import cors from 'cors';
 
 // so when user login so session is stored in server & session id is given to cookie and store in browser, when i open a anther page so cookie sent session to server to confirm the info.
+export const typeDefs = mergeTypeDefs([
+  usertypeDefs,
+  challenge_typeDefs,
+]);
 
+export const resolvers = mergeResolvers([
+  userresolvers,
+  challenge_resolvers,
+]);
 
 const apolloserver = new ApolloServer({ typeDefs, resolvers });
 
