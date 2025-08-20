@@ -99,7 +99,7 @@ const CodeEditor = () => {
     setRunningAction(actionType); // ✅ track which button was clicked
 
     try {
-      console.log(code)
+      
       const data=await getcode({ variables: { input: { code:code } } });
       console.log(data);
       // if (data.error) {
