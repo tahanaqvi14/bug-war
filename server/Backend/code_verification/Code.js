@@ -17,7 +17,7 @@ const Code = async (userCode) => {
     { input: [5, 7], expected: 12 },
     // Add more test cases as needed
   ];
-  console.log(userCode.code)
+
   try {
     // Ensure the user code exports the function
     const userFunction = vm.run(`
@@ -28,14 +28,14 @@ const Code = async (userCode) => {
     // Execute test cases
     const results = testCases.map((tc) => {
       const output = userFunction(...tc.input);
-    //   return {
-    //     input: tc.input,
-    //     expected: tc.expected,
-    //     output,
-    //     passed: output === tc.expected,
-    //   };
-    console.log(output);
+      return {
+        input: tc.input,
+        expected: tc.expected,
+        output,
+        passed: output === tc.expected,
+      };
     });
+    console.log(results);
     let pass=0;
     for (let element of results) {
         if(element.passed==true){
