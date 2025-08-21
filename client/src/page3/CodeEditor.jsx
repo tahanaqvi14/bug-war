@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './css/game.css';
-import { useQuery, gql,useLazyQuery } from "@apollo/client";
+import { useQuery, gql, useLazyQuery } from "@apollo/client";
 
 const GET_CHALLENGE = gql`
   query Get_challenge {
@@ -10,19 +10,27 @@ const GET_CHALLENGE = gql`
     }
   }
 `;
+
 const GET_RESULT_OF_CODE = gql`
     query checking_user_code($input: checking_code!){
         checking_user_code(input:$input){
             success
+            message{
+            input
+            expected
+            output
+            passed
             message
-        }
+            }
+            }
+        
     }
 `
 
 
 const CodeEditor = () => {
-  const { data:challenge_data, loading:challenge_loading, error:challenge_error } = useQuery(GET_CHALLENGE);
-  const [getcode,{ data:result_data, loading:result_loading, error:result_error }] = useLazyQuery(GET_RESULT_OF_CODE);
+  const { data: challenge_data, loading: challenge_loading, error: challenge_error } = useQuery(GET_CHALLENGE);
+  const [getcode, { data: result_data, loading: result_loading, error: result_error }] = useLazyQuery(GET_RESULT_OF_CODE);
 
   const containerRef = useRef(null);
   const editorRef = useRef(null);
@@ -99,9 +107,9 @@ const CodeEditor = () => {
     setRunningAction(actionType); // ✅ track which button was clicked
 
     try {
-      
-      const data=await getcode({ variables: { input: { code:code } } });
-      console.log(data);
+
+      const data = await getcode({ variables: { input: { code: code } } });
+      console.log('data:', data);
       // if (data.error) {
       //   setOutput('Error: ' + data.error);
       // } else if (data.results) {

@@ -13,7 +13,7 @@ const Code = async (userCode) => {
 
   // Define test cases
   const testCases = [
-    { input: [1, 2], expected: 3 },
+    // { input: [1, 2], expected: 3 },
     { input: [5, 7], expected: 12 },
     // Add more test cases as needed
   ];
@@ -35,6 +35,15 @@ const Code = async (userCode) => {
         passed: output === tc.expected,
       };
     });
+    const testCase = {
+        input: [1, 2],
+        expected: 3,
+        output: 2 + 2,
+        passed: false,
+        message: "Output did not match expected",
+        consolelogs: logs.map(item => item)
+      };
+    console.log("results:");
     console.log(results);
     let pass=0;
     for (let element of results) {
@@ -43,16 +52,20 @@ const Code = async (userCode) => {
         }
     }
     if (pass==2) {
+        console.log(pass)
         return {
           success: true,
-          message:'done hogaya' 
+          testCase
+        //   message: 'x'
             // results,
-            // logs, 
+            // logs,
         }
     }else{
+        console.log(pass)
         return {
           success: false,
-          message:'nhi hua' 
+          testCase
+        //   message:'bad G'
             // results,
             // logs, 
         }
