@@ -20,7 +20,8 @@ const challenge_typeDefs = gql`
         expected: Int
         output: Int
         passed: Boolean
-          message: String
+        message: String
+        consolelogs: [String]
   }
 
     type CodeResponse {

@@ -21,6 +21,7 @@ const GET_RESULT_OF_CODE = gql`
             output
             passed
             message
+            consolelogs
             }
             }
         
@@ -29,6 +30,7 @@ const GET_RESULT_OF_CODE = gql`
 
 
 const CodeEditor = () => {
+  let data;
   const { data: challenge_data, loading: challenge_loading, error: challenge_error } = useQuery(GET_CHALLENGE);
   const [getcode, { data: result_data, loading: result_loading, error: result_error }] = useLazyQuery(GET_RESULT_OF_CODE);
 
@@ -100,16 +102,20 @@ const CodeEditor = () => {
     }
   }, [challenge_loading, challenge_data]);
 
+
   const runCode = async (actionType) => {
     const code = editorRef.current.getValue();
     setIsRunning(true);
-
     setRunningAction(actionType); // ✅ track which button was clicked
 
     try {
-
-      const data = await getcode({ variables: { input: { code: code } } });
-      console.log('data:', data);
+      data = await getcode({ variables: { input: { code: code } } });
+      // console.log(data)
+      console.log(data.data.checking_user_code.message)
+      if (data.data.checking_user_code.message.consolelogs.length > 0) {
+        setOutput(data.data.checking_user_code.message.consolelogs.join('\n'))
+      }
+      
       // if (data.error) {
       //   setOutput('Error: ' + data.error);
       // } else if (data.results) {
@@ -132,7 +138,6 @@ const CodeEditor = () => {
       setRunningAction(null); // ✅ reset
     }
   };
-
   const handleReset = () => {
     const initialCode = `function ${challenge_data.Get_challenge[0].function_name}(){
   //Write your function inside this
