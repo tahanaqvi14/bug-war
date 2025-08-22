@@ -110,30 +110,17 @@ const CodeEditor = () => {
 
     try {
       data = await getcode({ variables: { input: { code: code } } });
-      // console.log(data)
       console.log(data.data.checking_user_code.message)
-      if (data.data.checking_user_code.message.consolelogs!=null) {
+      if (data.data.checking_user_code.message.consolelogs != null){
         setOutput(data.data.checking_user_code.message.consolelogs.join('\n'))
+      }else if(data.data.checking_user_code.message.message){
+        setOutput(data.data.checking_user_code.message.message)
       }
-      document.getElementById('input').innerText=`Input: ${data.data.checking_user_code.message.input}`
-      document.getElementById('expected').innerText=`Expected output: ${data.data.checking_user_code.message.expected}`
-      document.getElementById('passed').innerText=`${data.data.checking_user_code.message.passed ? '✅ Test cases Passed\n\n' : '❌ Test cases Failed\n\n'}`
+      if (data.data.checking_user_code.message.input) document.getElementById('input').innerText = `Input: ${data.data.checking_user_code.message.input}`
+      if (data.data.checking_user_code.message.expected) document.getElementById('expected').innerText = `Expected output: ${data.data.checking_user_code.message.expected}`
+      if (data.data.checking_user_code.message.passed != null) document.getElementById('passed').innerText = `${data.data.checking_user_code.message.passed ? '✅ Test cases Passed\n\n' : '❌ Test cases Failed\n\n'}`
       
-      // if (data.error) {
-      //   setOutput('Error: ' + data.error);
-      // } else if (data.results) {
-      //   let resultText = '';
-      //   data.results.forEach((r, idx) => {
-      //     resultText += `Test Case ${idx + 1}:`;
-      //     resultText += `Input: [${r.input.join(', ')}]`;
-      //     resultText += `Expected: ${r.expected}, Got: ${r.output}`;
-      //     resultText += r.passed ? '✅ Passed\n\n' : '❌ Failed\n\n';
-      //   });
-      //   if (data.logs.length > 0) {
-      //     resultText += 'Console Logs:\n' + data.logs.join('\n');
-      //   }
-      //   setOutput(resultText);
-      // }
+
     } catch (err) {
       setOutput('Fetch error: ' + err.message);
     } finally {

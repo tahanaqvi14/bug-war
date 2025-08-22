@@ -1,7 +1,19 @@
-import { NodeVM } from 'vm2';
+import { NodeVM, VM } from 'vm2';
 
 const Code = async (userCode) => {
-    // Setup NodeVM
+    // Step 1: Pre-validate syntax with VM class
+    try {
+        const syntaxVM = new VM({ timeout: 1000 });
+        syntaxVM.run(userCode.code);
+    } catch (syntaxError) {
+        return {
+            success: false,
+            message: `Syntax Error: ${syntaxError.message}`,
+            type: 'syntax'
+        };
+    }
+
+    // Step 2: Setup NodeVM for actual execution
     const vm = new NodeVM({
         console: 'redirect', // capture console.log
         timeout: 2000,       // 2 seconds max
@@ -9,7 +21,7 @@ const Code = async (userCode) => {
     });
 
     let logs = [];
-    vm.on('console.log', (msg) => logs.push(msg));
+    // vm.on('console.log', (msg) => logs.push(msg));
 
     // Define test cases
     const testCases = [
@@ -21,9 +33,9 @@ const Code = async (userCode) => {
     try {
         // Ensure the user code exports the function
         const userFunction = vm.run(`
-      ${userCode.code}
-      module.exports = twosum;
-    `);
+            ${userCode.code}
+            module.exports = twosum;
+        `);
 
         // Execute test cases
         const results = testCases.map((tc) => {
@@ -35,24 +47,16 @@ const Code = async (userCode) => {
                 passed: output === tc.expected,
             };
         });
-        // const testCase = {
-        //     input: [1, 2],
-        //     expected: 3,
-        //     output: 2 + 2,
-        //     passed: false,
-        //     message: "Output did not match expected",
-        //     consolelogs: logs.map(item => item)
-        //   };
-        console.log("results:", results);
 
         let pass = 0;
+
         for (let element of results) {
             if (element.passed == true) {
                 pass += 1;
             }
         }
+
         if (pass == 2) {
-            console.log(pass)
             return {
                 success: true,
                 message: {
@@ -63,10 +67,8 @@ const Code = async (userCode) => {
                     message: "Output did match expected",
                     ...(logs.length > 0 && { consolelogs: logs.map(item => item) })
                 }
-
-            }
+            };
         } else {
-            console.log(pass)
             return {
                 success: false,
                 message: {
@@ -77,12 +79,14 @@ const Code = async (userCode) => {
                     message: "Output did not match expected",
                     ...(logs.length > 0 && { consolelogs: logs.map(item => item) })
                 }
-            }
+            };
         }
     } catch (error) {
+        // Handle runtime errors, reference errors, etc.
         return {
             success: false,
-            message: error.message,
+            message: {
+                message:`Runtime Error: ${error.message}`},
         };
     }
 };

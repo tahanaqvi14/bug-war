@@ -10,7 +10,6 @@ const challenge_resolvers = {
         },
         checking_user_code: async (parent, args) => {
             const result = Code(args.input);
-            console.log('result:',result);
             return result
         }
     }
