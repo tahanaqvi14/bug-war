@@ -112,9 +112,12 @@ const CodeEditor = () => {
       data = await getcode({ variables: { input: { code: code } } });
       // console.log(data)
       console.log(data.data.checking_user_code.message)
-      if (data.data.checking_user_code.message.consolelogs.length > 0) {
+      if (data.data.checking_user_code.message.consolelogs!=null) {
         setOutput(data.data.checking_user_code.message.consolelogs.join('\n'))
       }
+      document.getElementById('input').innerText=`Input: ${data.data.checking_user_code.message.input}`
+      document.getElementById('expected').innerText=`Expected output: ${data.data.checking_user_code.message.expected}`
+      document.getElementById('passed').innerText=`${data.data.checking_user_code.message.passed ? '✅ Test cases Passed\n\n' : '❌ Test cases Failed\n\n'}`
       
       // if (data.error) {
       //   setOutput('Error: ' + data.error);
@@ -259,6 +262,11 @@ const CodeEditor = () => {
             >
               <p className="font-semibold mb-2 text-white">Output</p>
               <p className="text-sm whitespace-pre-wrap">{output}</p>
+            </div>
+            <div>
+              <p id='input'></p>
+              <p id='expected'></p>
+              <p id='passed'></p>
             </div>
           </div>
         </div>
