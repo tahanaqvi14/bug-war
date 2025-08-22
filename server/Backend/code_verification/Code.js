@@ -1,6 +1,6 @@
 import { NodeVM, VM } from 'vm2';
 
-const Code = async (userCode) => {
+const Code = async (userCode,challengeinfo) => {
     // Step 1: Pre-validate syntax with VM class
     try {
         const syntaxVM = new VM({ timeout: 1000 });
@@ -25,16 +25,14 @@ const Code = async (userCode) => {
 
     // Define test cases
     const testCases = [
-        // { input: [1, 2], expected: 3 },
-        { input: [5, 7], expected: 12 },
-        // Add more test cases as needed
+        { input: challengeinfo[0].testcase, expected:challengeinfo[0].expected },
     ];
 
     try {
         // Ensure the user code exports the function
         const userFunction = vm.run(`
             ${userCode.code}
-            module.exports = twosum;
+            module.exports = ${challengeinfo[0].function_name};
         `);
 
         // Execute test cases

@@ -7,6 +7,7 @@ const GET_CHALLENGE = gql`
     Get_challenge {
       function_name
       problem_statement
+      id_number
     }
   }
 `;
@@ -33,7 +34,7 @@ const CodeEditor = () => {
   let data;
   const { data: challenge_data, loading: challenge_loading, error: challenge_error } = useQuery(GET_CHALLENGE);
   const [getcode, { data: result_data, loading: result_loading, error: result_error }] = useLazyQuery(GET_RESULT_OF_CODE);
-
+  console.log(challenge_data)
   const containerRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -109,7 +110,7 @@ const CodeEditor = () => {
     setRunningAction(actionType); // ✅ track which button was clicked
 
     try {
-      data = await getcode({ variables: { input: { code: code } } });
+      data = await getcode({ variables: { input: { code: code, challengeid:challenge_data.Get_challenge[0].function_name} } });
       console.log(data.data.checking_user_code.message)
       if (data.data.checking_user_code.message.consolelogs != null){
         setOutput(data.data.checking_user_code.message.consolelogs.join('\n'))

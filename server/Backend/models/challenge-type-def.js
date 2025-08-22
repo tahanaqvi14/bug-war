@@ -4,6 +4,7 @@ const challenge_typeDefs = gql`
     type challenge{
         function_name:String
         problem_statement:String
+        id_number:Int
     }
 
     type Query{
