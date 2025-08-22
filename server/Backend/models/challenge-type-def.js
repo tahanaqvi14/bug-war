@@ -14,6 +14,7 @@ const challenge_typeDefs = gql`
 
     input checking_code{
         code:String!
+        challengeid:Int!
     }
 
     type TestCase {

@@ -2,28 +2,28 @@ import { NodeVM, VM } from 'vm2';
 
 const Code = async (userCode,challengeinfo) => {
     // Step 1: Pre-validate syntax with VM class
+    console.log(userCode)
     try {
         const syntaxVM = new VM({ timeout: 1000 });
-        syntaxVM.run(userCode.code);
+        syntaxVM.run(userCode);
     } catch (syntaxError) {
         return {
             success: false,
-            message: `Syntax Error: ${syntaxError.message}`,
-            type: 'syntax'
+            message:{
+                message:`Syntax Error: ${syntaxError.message}`,
+            }
         };
     }
 
-    // Step 2: Setup NodeVM for actual execution
     const vm = new NodeVM({
-        console: 'redirect', // capture console.log
-        timeout: 2000,       // 2 seconds max
+        console: 'redirect',
+        timeout: 2000,       
         sandbox: {},
     });
 
     let logs = [];
-    // vm.on('console.log', (msg) => logs.push(msg));
-
-    // Define test cases
+    vm.on('console.log', (msg) => logs.push(msg));
+    
     const testCases = [
         { input: challengeinfo[0].testcase, expected:challengeinfo[0].expected },
     ];
@@ -31,7 +31,7 @@ const Code = async (userCode,challengeinfo) => {
     try {
         // Ensure the user code exports the function
         const userFunction = vm.run(`
-            ${userCode.code}
+            ${userCode}
             module.exports = ${challengeinfo[0].function_name};
         `);
 

@@ -6,14 +6,12 @@ const challenge_resolvers = {
         Get_challenge: async () => {
             const ChallengeModel = getUserModel('Challenges');
             const challenge = await ChallengeModel.find({ id_number: Math.floor(Math.random() * 2) + 1 })
-            console.log('result: ',challenge)
             return challenge;
         },
         checking_user_code: async (parent, args) => {
-            console.log('this is input',args.input)
             const ChallengeModel = getUserModel('Challenges');
-            const challenge = await ChallengeModel.find();
-            const result = Code(args.input,challenge);
+            const challenge = await ChallengeModel.find({ id_number: args.input.challengeid })
+            const result = Code(args.input.code,challenge);
             return result
         }
     }
