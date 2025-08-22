@@ -2,7 +2,7 @@ import { NodeVM, VM } from 'vm2';
 
 const Code = async (userCode,challengeinfo) => {
     // Step 1: Pre-validate syntax with VM class
-    console.log(userCode)
+    
     try {
         const syntaxVM = new VM({ timeout: 1000 });
         syntaxVM.run(userCode);
@@ -54,7 +54,7 @@ const Code = async (userCode,challengeinfo) => {
             }
         }
 
-        if (pass == 2) {
+        if (pass == 1) {
             return {
                 success: true,
                 message: {
@@ -62,10 +62,10 @@ const Code = async (userCode,challengeinfo) => {
                     expected: results[0].expected,
                     output: results[0].output,
                     passed: true,
-                    message: "Output did match expected",
+                    // message: "Output did match expected",
                     ...(logs.length > 0 && { consolelogs: logs.map(item => item) })
                 }
-            };
+            }
         } else {
             return {
                 success: false,
@@ -74,7 +74,7 @@ const Code = async (userCode,challengeinfo) => {
                     expected: results[0].expected,
                     output: results[0].output,
                     passed: false,
-                    message: "Output did not match expected",
+                    // message: "Output did not match expected",
                     ...(logs.length > 0 && { consolelogs: logs.map(item => item) })
                 }
             };

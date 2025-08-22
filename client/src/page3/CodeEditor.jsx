@@ -118,15 +118,13 @@ const CodeEditor = () => {
       const { data } = await getcode({
         variables: { input: { code, challengeid: challenge_data.Get_challenge[0].id_number } },
       });
-      console.log(data);
+
       const msg = data.checking_user_code.message;
-      console.log(msg);
 
       if (msg.consolelogs != null) {
         setOutput(msg.consolelogs.join("\n"));
-        console.log(msg.consolelogs)
+
       } else if (msg.message) {
-        console.log(msg.consolelogs)
         setOutput(msg.message);
       }
 
