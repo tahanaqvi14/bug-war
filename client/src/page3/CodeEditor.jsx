@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState,useContext } from 'react';
 import './css/game.css';
+import { SocketContext } from '../App';
 import { useQuery, gql, useLazyQuery } from "@apollo/client";
 
 const GET_CHALLENGE = gql`
@@ -29,6 +30,7 @@ const GET_RESULT_OF_CODE = gql`
 `;
 
 const CodeEditor = () => {
+  const socket = useContext(SocketContext);
   const { data: challenge_data, loading: challenge_loading, error: challenge_error } = useQuery(GET_CHALLENGE);
   const [getcode] = useLazyQuery(GET_RESULT_OF_CODE);
 
@@ -49,6 +51,10 @@ const CodeEditor = () => {
 
   // Load Monaco editor once
   useEffect(() => {
+    if (socket){
+      console.log(`Socket connected in codeeditor component:${socket.id}`);
+    }
+
     let loaderScript;
 
     if (!window.monaco) {

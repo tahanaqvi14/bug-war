@@ -21,6 +21,7 @@ const LOGIN_USER_MUTATION = gql`
 
 const Login = ({ connectSocket }) => {
   const socket = useContext(SocketContext);
+  console.log(socket);
   const navigate = useNavigate();
   
 
