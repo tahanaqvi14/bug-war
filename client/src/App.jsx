@@ -10,6 +10,7 @@ import Login from './Login-Signup/Components/Login';
 import Singup from './Login-Signup/Components/Singup';
 import Gamingpage from './page3/Gamingpage'
 import CodeEditor from './page3/CodeEditor';
+import Mainmenu from './page2/Mainmenu'
 
 // Create Socket.IO context to share socket instance
 export const SocketContext = createContext();
@@ -43,12 +44,13 @@ const App = () => {
 
             {/* Pass connectSocket down to Login */}
             {/* <Route path="/" element={<Login connectSocket={connectSocket} />} /> */}
-            
             <Route path="/codeeditor" element={<CodeEditor />} />
             <Route path="/" element={<Login connectSocket={connectSocket} />} />
             {/* <Route path="/gamepage" element={<Gamingpage />} /> */}
-            {/* <Route path="/signup" element={<Singup />} /> */}
-            <Route path="/page2" element={<Secondpage />} />
+            <Route path="/signup" element={<Singup />} />
+
+            {/* <Route path="/page2" element={<Secondpage />} /> */}
+            <Route path="/page2" element={<Mainmenu />} />
           </Routes>
         </SocketContext.Provider>
       </ApolloProvider>

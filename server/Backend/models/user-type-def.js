@@ -15,6 +15,7 @@ const typeDefs = gql`
     type Query {
         LeaderBoard_Info: [user!]!
         FindUserForProfile:user
+        Main_menu:user
 
     }
 

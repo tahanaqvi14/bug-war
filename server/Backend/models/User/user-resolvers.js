@@ -23,6 +23,12 @@ const resolvers = {
             } else {
                 console.log(is_user_authenticated);
             }
+        },
+        Main_menu: async (parent, args, context) => {
+            const UserModel = getUserModel('Users');
+            const user_all_info = await UserModel.findOne({ username: context.req.session.user.username }); // FIX: await
+            // console.log(user_all_info)
+            return user_all_info
         }
     },
 

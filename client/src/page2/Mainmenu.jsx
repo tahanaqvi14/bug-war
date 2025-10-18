@@ -1,0 +1,85 @@
+// if (loading) return <p>Loading...</p>;
+// if (error) return <p>Error: {error.message}</p>;
+import React from "react";
+import "./Mainmenu.css";
+import { useQuery, gql } from '@apollo/client';
+import profile from "./images/profile.svg";
+import game from "./images/game.svg";
+import trophy from "./images/trophy.svg";
+
+const DISPLAY_NAME_QUERY = gql`
+  query MainMenu {
+    Main_menu {
+      displayname
+    }
+  }
+`;
+
+const Mainmenu = () => {
+  const { loading, error, data } = useQuery(DISPLAY_NAME_QUERY);
+  const displayname = data?.Main_menu?.displayname;
+  return (
+    <div className="welcome-page">
+      <h1>Welcome, {displayname || 'Guest'}!</h1>
+      <p className="subtitle">Choose your next challenge and climb the ranks</p>
+
+      <div className="card-container">
+        <div className="big_card">
+          <div className="container">
+            <div className="header">
+              <div>
+                <img src={profile} alt="Profile" style={{ width: "80px" }} />
+                <div className="title">User Profile</div>
+                <div className="subtitle">
+                  Manage your account <br />
+                  <span>and stats</span>
+                </div>
+                <a href="#" className="play-btn">
+                  Open Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="big_card">
+          <div className="container">
+            <div className="header">
+              <div>
+                <img src={game} alt="Game" style={{ width: "80px" }} />
+                <div className="title">Start Game</div>
+                <div className="subtitle">
+                  Begin a new coding <br />
+                  <span>challenge</span>
+                </div>
+                <a href="#" className="play-btn">
+                  Play Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="big_card">
+          <div className="container">
+            <div className="header">
+              <div>
+                <img src={trophy} alt="Leaderboard" style={{ width: "80px" }} />
+                <div className="title">Leaderboard</div>
+                <div className="subtitle">
+                  View rankings and <br />
+                  <span>compete with others</span>
+                </div>
+                <a href="#" className="play-btn">
+                  View Ranking
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Mainmenu;

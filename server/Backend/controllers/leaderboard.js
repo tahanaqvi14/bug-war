@@ -1,10 +1,5 @@
 import { getUserModel } from '../utils/getUserModel.js';
 
-
-
-
-
-
 export  async function board(req, res) {
     try {
         const UseruserModel = getUserModel('Users');

@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const ownerModel = require('../models/owner');
@@ -9,7 +8,6 @@ router.get('/admin', function (req, res) {
 });
 
 console.log(process.env.NODE_ENV);
-
 // create owner only in development mode, in production mode we should not allow
 //  this route to be accessed by anyone other than admin
 if (process.env.NODE_ENV === 'development') {
@@ -28,5 +26,4 @@ if (process.env.NODE_ENV === 'development') {
         }
     });
 }
-
 module.exports = router;

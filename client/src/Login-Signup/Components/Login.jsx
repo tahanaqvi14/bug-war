@@ -18,12 +18,10 @@ const LOGIN_USER_MUTATION = gql`
     }
 `
 
-
 const Login = ({ connectSocket }) => {
   const socket = useContext(SocketContext);
   console.log(socket);
-  const navigate = useNavigate();
-  
+  const navigate = useNavigate();  
 
   const btnRef = useRef();
   const [login_User] = useMutation(LOGIN_USER_MUTATION);
@@ -50,10 +48,8 @@ const Login = ({ connectSocket }) => {
     
     const username = usernameRef.current.value;
     const password = passwordRef.current.value;
-    
     showLoader();
     const a=await login_User({ variables: { input: { username: username, password: password } } });
-
     if (a.data.user_login.success==false) {
       toast.error(a.data.user_login.message, {
         position: "top-center", 
