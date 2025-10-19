@@ -8,7 +8,6 @@ const resolvers = {
         LeaderBoard_Info: async () => {
             const UserModel = getUserModel('Users');
             const users = await UserModel.find().sort({ points: -1 });
-            console.log(users);
             return users;
         },
 

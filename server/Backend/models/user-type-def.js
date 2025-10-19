@@ -16,7 +16,6 @@ const typeDefs = gql`
         LeaderBoard_Info: [user!]!
         FindUserForProfile:user
         Main_menu:user
-
     }
 
     type CreateUserResponse {

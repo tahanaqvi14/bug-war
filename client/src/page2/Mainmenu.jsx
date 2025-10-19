@@ -6,6 +6,7 @@ import { useQuery, gql } from '@apollo/client';
 import profile from "./images/profile.svg";
 import game from "./images/game.svg";
 import trophy from "./images/trophy.svg";
+import { useNavigate } from 'react-router-dom';
 
 const DISPLAY_NAME_QUERY = gql`
   query MainMenu {
@@ -16,6 +17,7 @@ const DISPLAY_NAME_QUERY = gql`
 `;
 
 const Mainmenu = () => {
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery(DISPLAY_NAME_QUERY);
   const displayname = data?.Main_menu?.displayname;
   return (
@@ -70,7 +72,7 @@ const Mainmenu = () => {
                   View rankings and <br />
                   <span>compete with others</span>
                 </div>
-                <a href="#" className="play-btn">
+                <a onClick={() => navigate('/leaderboard')}  className="play-btn">
                   View Ranking
                 </a>
               </div>

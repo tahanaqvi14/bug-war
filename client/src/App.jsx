@@ -11,6 +11,8 @@ import Singup from './Login-Signup/Components/Singup';
 import Gamingpage from './page3/Gamingpage'
 import CodeEditor from './page3/CodeEditor';
 import Mainmenu from './page2/Mainmenu'
+import Leaderboard from './page2/Leaderboard';
+
 
 // Create Socket.IO context to share socket instance
 export const SocketContext = createContext();
@@ -51,6 +53,7 @@ const App = () => {
 
             {/* <Route path="/page2" element={<Secondpage />} /> */}
             <Route path="/page2" element={<Mainmenu />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Routes>
         </SocketContext.Provider>
       </ApolloProvider>
