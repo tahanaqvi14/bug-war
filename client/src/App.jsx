@@ -12,6 +12,7 @@ import Gamingpage from './page3/Gamingpage'
 import CodeEditor from './page3/CodeEditor';
 import Mainmenu from './page2/Mainmenu'
 import Leaderboard from './page2/Leaderboard';
+import Profile from './page2/Profile';
 
 
 // Create Socket.IO context to share socket instance
@@ -54,6 +55,7 @@ const App = () => {
             {/* <Route path="/page2" element={<Secondpage />} /> */}
             <Route path="/page2" element={<Mainmenu />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </SocketContext.Provider>
       </ApolloProvider>

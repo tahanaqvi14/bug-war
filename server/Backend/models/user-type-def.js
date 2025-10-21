@@ -36,7 +36,6 @@ const typeDefs = gql`
 
     input updateuser{
         newdisplayname:String!
-        newpassword:String!
     }
 
     type Mutation{

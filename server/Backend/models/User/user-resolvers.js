@@ -5,24 +5,34 @@ import isloggedin from "../../middleware/isloggedIn.js"
 
 const resolvers = {
     Query: {
-        LeaderBoard_Info: async () => {
+        LeaderBoard_Info: async (parent, args, context) => {
+            if (context.loggedIn==false) {
+                return "You must be logged in to view this page."
+            }
             const UserModel = getUserModel('Users');
             const users = await UserModel.find().sort({ points: -1 });
             return users;
         },
 
         FindUserForProfile: async (parent, args, context) => {
-            const { user } = context; // FIX: Use context.user from JWT/session
-            const { req } = context; // FIX: Use context.user from JWT/session
-            const is_user_authenticated = await isloggedin(req); // ✅ pass req
-            if (is_user_authenticated) {
-                const UserModel = getUserModel('Users');
-                const user_all_info = await UserModel.findOne({ username: user.username }); // FIX: await
-                return user_all_info;
-            } else {
-                console.log(is_user_authenticated);
-            }
+            // const { user } = context; // FIX: Use context.user from JWT/session
+            // const { req } = context; // FIX: Use context.user from JWT/session
+            // const is_user_authenticated = await isloggedin(req); // this is for middle ware
+
+            // if (is_user_authenticated) {
+            //     const UserModel = getUserModel('Users');
+            //     const user_all_info = await UserModel.findOne({ username: user.username });
+            //     return user_all_info;
+            // } else {
+            //     console.log(is_user_authenticated);
+            // }
+
+            const UserModel = getUserModel('Users');
+            const user_all_info = await UserModel.findOne({ username: context.req.session.user.username });
+            return user_all_info;
+
         },
+
         Main_menu: async (parent, args, context) => {
             const UserModel = getUserModel('Users');
             const user_all_info = await UserModel.findOne({ username: context.req.session.user.username }); // FIX: await
@@ -97,26 +107,26 @@ const resolvers = {
         },
 
         Update: async (parent, args, context) => {
+            console.log(args.input);
             try {
-                const { user } = context; // FIX: context contains logged-in user
-                if (!user || !user.username) {
-                    throw new Error('User not authenticated');
-                }
-
+                // const { user } = context;
+                // if (!user || !user.username) {
+                //     throw new Error('User not authenticated');
+                // }
+                
                 const UserModel = getUserModel('Users');
                 const fetchedinfo = args.input;
 
-                const After_Auth = await Authenticator({
-                    username: user.username,
-                    displayname: fetchedinfo.newdisplayname,
-                    password: fetchedinfo.newpassword
-                });
+                // const After_Auth = await Authenticator({
+                //     username: user.username,
+                //     displayname: fetchedinfo.newdisplayname,
+                //     password: fetchedinfo.newpassword
+                // });
 
                 const updatedUser = await UserModel.findOneAndUpdate(
-                    { username: user.username },
+                    { username: context.req.session.user.username },
                     {
-                        displayname: After_Auth.displayname,
-                        password: After_Auth.hash
+                        displayname: fetchedinfo.newdisplayname,
                     },
                     { new: true }
                 );

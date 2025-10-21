@@ -59,7 +59,8 @@ const Login = ({ connectSocket }) => {
         pauseOnHover: true,
         draggable: true,
         theme: "colored",
-      });
+      })
+
     }else{
       toast.success(a.data.user_login.message, {
         position: "top-center",
@@ -84,6 +85,7 @@ const Login = ({ connectSocket }) => {
 
 
   return (
+
     <div className="flex justify-center items-center h-screen">
       <div className="rounded-3xl bg-[#fce9b8] border-4 border-[#7f4f0a] shadow-[6px_6px_0_0_#7f4f0a] w-full max-w-md p-6 flex flex-col gap-4 text-[#5a3a1a]">
         <div className="flex justify-between">
@@ -97,6 +99,7 @@ const Login = ({ connectSocket }) => {
           </div>
           <button className="bg-[#F4B24B] font-bold px-4 rounded-md" onClick={goto_signup}>Sign Up</button>
         </div>
+
         <form aria-label="Sign up form" className="rounded-3xl w-full max-w-md p-4 relative" onSubmit={handleSubmit}>
           <div className="wave-group">
             <input required type="text" name="username" id="username" className="input" ref={usernameRef}/>
@@ -105,8 +108,8 @@ const Login = ({ connectSocket }) => {
               {input_text1.map((value, index) => (
                 <span className="label-char" key={index} style={{ "--index": index }}>{value}</span>
               ))}
-
             </label>
+
           </div>
           <div className="wave-group">
             <input required type="password" name="password" id="password" className="input" ref={passwordRef}/>

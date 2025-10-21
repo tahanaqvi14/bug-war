@@ -11,7 +11,7 @@ import challenge_resolvers from './models/Challenges/challenge-resolvers.js'
 import userresolvers from './models/User/user-resolvers.js'
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { mergeResolvers } from '@graphql-tools/merge';
-
+import isloggedin from './middleware/isloggedIn.js';
 
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
@@ -309,7 +309,9 @@ app.use('/graphql', expressMiddleware(apolloserver, {
     // Inside here, you can access:
     // req — the incoming request (includes headers, session, cookies, etc.)
     // return { req, user: req.session?.user };
-    return { req, res };
+    const loggedIn = await isloggedin(req);
+    return { req, res, loggedIn };
+
     // If the session exists, get the user from it. If not, return undefined.”
   },
 }));

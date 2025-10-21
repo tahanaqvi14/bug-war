@@ -3,7 +3,7 @@ import "./Leaderboard.css";
 import { gql, useQuery } from "@apollo/client"; // ✅ you forgot to import useQuery!
 import trophy from "./images/trophy-copy.svg";
 import scroll from "./images/scroll.svg";
-
+import { useNavigate } from 'react-router-dom';
 // GraphQL query
 export const GET_LEADERBOARD_INFO = gql`
   query {
@@ -15,11 +15,16 @@ export const GET_LEADERBOARD_INFO = gql`
 `;
 
 const Leaderboard = () => {
+    const navigate = useNavigate();
     const { data, loading, error } = useQuery(GET_LEADERBOARD_INFO);
     const users = data?.LeaderBoard_Info || [];
-
+    
     if (loading) return <p className="text-center mt-10 text-lg">Loading leaderboard...</p>;
-    if (error) return <p className="text-center mt-10 text-lg text-red-600">Error loading leaderboard 😢</p>;
+    if (error){
+
+        // return <p className="text-center mt-10 text-lg text-red-600">Error loading leaderboard 😢</p>;   
+        return navigate('/')
+    }
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-b from-[#8dc9c0] via-[#f7b96a] to-[#f9a62b] relative">

@@ -36,7 +36,7 @@ const Mainmenu = () => {
                   Manage your account <br />
                   <span>and stats</span>
                 </div>
-                <a href="#" className="play-btn">
+                <a onClick={() => navigate('/profile')} className="play-btn">
                   Open Profile
                 </a>
               </div>
@@ -72,7 +72,7 @@ const Mainmenu = () => {
                   View rankings and <br />
                   <span>compete with others</span>
                 </div>
-                <a onClick={() => navigate('/leaderboard')}  className="play-btn">
+                <a onClick={() => navigate('/leaderboard')} className="play-btn">
                   View Ranking
                 </a>
               </div>
