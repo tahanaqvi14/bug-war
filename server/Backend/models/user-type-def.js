@@ -42,6 +42,7 @@ const typeDefs = gql`
         user_creation(input:createuser!):CreateUserResponse!
         user_login(input:loginuser!):CreateUserResponse!
         Update(input:updateuser):user
+        logout:CreateUserResponse!
     }
 `
 export default typeDefs;

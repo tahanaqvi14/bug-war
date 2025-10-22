@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Leaderboard.css";
 import { gql, useQuery } from "@apollo/client"; // ✅ you forgot to import useQuery!
 import trophy from "./images/trophy-copy.svg";
@@ -18,13 +18,39 @@ const Leaderboard = () => {
     const navigate = useNavigate();
     const { data, loading, error } = useQuery(GET_LEADERBOARD_INFO);
     const users = data?.LeaderBoard_Info || [];
-    
-    if (loading) return <p className="text-center mt-10 text-lg">Loading leaderboard...</p>;
-    if (error){
 
-        // return <p className="text-center mt-10 text-lg text-red-600">Error loading leaderboard 😢</p>;   
-        return navigate('/')
+    useEffect(() => {
+        if (error?.message?.includes("Not authenticated")) {
+            const timer = setTimeout(() => navigate("/"), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, navigate]);
+
+    if (loading)
+        return (
+            <p className="text-center mt-10 text-lg">Loading leaderboard...</p>
+        );
+
+    if (error) {
+        if (error.message.includes("Not authenticated")) {
+            return (
+                <div>
+                    <p className="text-center mt-10 text-lg text-red-600">
+                        You need to log in to view this page
+                    </p>
+                    <p className="text-center mt-10 text-lg text-red-600">
+                        You will be redirected to the login page in 2 seconds
+                    </p>
+                </div>
+            );
+        }
+        return (
+            <p className="text-center mt-10 text-lg text-red-600">
+                An error occurred
+            </p>
+        );
     }
+
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-b from-[#8dc9c0] via-[#f7b96a] to-[#f9a62b] relative">

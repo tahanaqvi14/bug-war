@@ -130,7 +130,7 @@ const Singup = () => {
             <span className="bar"></span>
             <label htmlFor="password" className="label text-[#6b4a1e] font-semibold text-xl mb-2 select-none">
               {input_text3.map((value, index) => (
-                <span className="label-char" style={{ "--index": index }}>{value}</span>
+                <span className="label-char" key={index} style={{ "--index": index }}>{value}</span>
               ))}
             </label>
           </div>

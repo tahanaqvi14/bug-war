@@ -1,6 +1,6 @@
 // if (loading) return <p>Loading...</p>;
 // if (error) return <p>Error: {error.message}</p>;
-import React from "react";
+import React,{useEffect} from "react";
 import "./Mainmenu.css";
 import { useQuery, gql } from '@apollo/client';
 import profile from "./images/profile.svg";
@@ -20,6 +20,41 @@ const Mainmenu = () => {
   const navigate = useNavigate();
   const { loading, error, data } = useQuery(DISPLAY_NAME_QUERY);
   const displayname = data?.Main_menu?.displayname;
+
+  useEffect(() => {
+    if (error?.message?.includes("Not authenticated")) {
+      const timer = setTimeout(() => navigate("/"), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, navigate]);
+
+  if (loading)
+    return (
+      <p className="text-center mt-10 text-lg">Loading Main Menu...</p>
+    );
+
+  if (error) {
+    if (error.message.includes("Not authenticated")) {
+      return (
+        <div>
+          <p className="text-center mt-10 text-lg text-red-600">
+            You need to log in to view this page
+          </p>
+          <p className="text-center mt-10 text-lg text-red-600">
+            You will be redirected to the login page in 2 seconds
+          </p>
+        </div>
+      );
+    }
+    return (
+      <p className="text-center mt-10 text-lg text-red-600">
+        An error occurred
+      </p>
+    );
+  }
+
+
+
   return (
     <div className="welcome-page">
       <h1>Welcome, {displayname || 'Guest'}!</h1>

@@ -7,7 +7,7 @@ const resolvers = {
     Query: {
         LeaderBoard_Info: async (parent, args, context) => {
             if (context.loggedIn==false) {
-                return "You must be logged in to view this page."
+                throw new Error("Not authenticated");
             }
             const UserModel = getUserModel('Users');
             const users = await UserModel.find().sort({ points: -1 });
@@ -26,7 +26,9 @@ const resolvers = {
             // } else {
             //     console.log(is_user_authenticated);
             // }
-
+            if (context.loggedIn==false) {
+                throw new Error("Not authenticated");
+            }
             const UserModel = getUserModel('Users');
             const user_all_info = await UserModel.findOne({ username: context.req.session.user.username });
             return user_all_info;
@@ -34,6 +36,9 @@ const resolvers = {
         },
 
         Main_menu: async (parent, args, context) => {
+            if (context.loggedIn==false) {
+                throw new Error("Not authenticated");
+            }
             const UserModel = getUserModel('Users');
             const user_all_info = await UserModel.findOne({ username: context.req.session.user.username }); // FIX: await
             // console.log(user_all_info)
@@ -105,6 +110,51 @@ const resolvers = {
 
             }
         },
+
+        logout: async (parent, args, context) => {
+            try {
+                // --- Destroy session ---
+                if (context.req.session) {
+                    await new Promise((resolve, reject) => {
+                        context.req.session.destroy(err => {
+                            if (err) {
+                                console.error("Error destroying session:", err);
+                                reject(err);
+                            } else {
+                                resolve();
+                            }
+                        });
+                    });
+                }
+        
+                // --- Clear JWT cookie ---
+                context.res.clearCookie("token", {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    secure: process.env.NODE_ENV === "production", // should be true in production
+                });
+        
+                // --- Clear username cookie (if you set one) ---
+                context.res.clearCookie("username", {
+                    sameSite: "lax",
+                    secure: process.env.NODE_ENV === "production",
+                });
+        
+                console.log("✅ User logged out successfully");
+        
+                return {
+                    success: true,
+                    message: "Logout successful",
+                };
+            } catch (error) {
+                console.error("❌ Logout error:", error);
+                return {
+                    success: false,
+                    message: `Logout failed: ${error.message}`,
+                };
+            }
+        },
+        
 
         Update: async (parent, args, context) => {
             console.log(args.input);

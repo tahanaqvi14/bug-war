@@ -8,32 +8,45 @@ import edit from "./images/edit.svg";
 import sound from "./images/sound.svg";
 import save from "./images/save.svg";
 import cross from "./images/cross.svg";
+import { useApolloClient } from "@apollo/client";
 
 
 
 const PROFILE_MUTATION = gql`
-  mutation Update($input: updateuser!) {
+mutation Update($input: updateuser!) {
     Update(input: $input) {
-      displayname
-    }
-  }
+        displayname
+        }
+        }
 `;
 
-const GET_PROFILE_INFO = gql`
-  query {
-    FindUserForProfile {
-      displayname
-      username
+const LOGOUT_MUTATION = gql`
+mutation Logout {
+    logout {
+        success
+        message
     }
+    }
+    `;
+    
+    
+    const GET_PROFILE_INFO = gql`
+    query {
+        FindUserForProfile {
+            displayname
+            username
+            }
   }
-`;
-
-const Profile = () => {
-    const navigate = useNavigate();
+  `;
+  
+  const Profile = () => {
+      const client = useApolloClient();
+      const navigate = useNavigate();
 
     // GraphQL hooks
     const { data, loading, error } = useQuery(GET_PROFILE_INFO);
     const [updateProfile] = useMutation(PROFILE_MUTATION);
+    const [logoutProfile] = useMutation(LOGOUT_MUTATION);
 
     const users = data?.FindUserForProfile;
 
@@ -50,6 +63,13 @@ const Profile = () => {
         }
     }, [users]);
 
+    useEffect(() => {
+        if (error?.message?.includes("Not authenticated")) {
+            const timer = setTimeout(() => navigate("/"), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, navigate]);
+
     // Handlers
     const handleEditClick = () => {
         setIsEditing(true);
@@ -63,6 +83,7 @@ const Profile = () => {
             setDisplayName(tempName.trim() || "Unnamed");
             setIsEditing(false);
             toast.success("Profile updated successfully!");
+            window.location.reload();
         } catch (err) {
             toast.error("Failed to update profile!");
         }
@@ -73,18 +94,58 @@ const Profile = () => {
         setIsEditing(false);
     };
 
-    const handleLogout = () => {
-        // add your logout logic here (e.g. remove token, redirect, etc.)
-        navigate('/');
-        toast.info("Logged out successfully!");
-    };
+    const handleLogout = async () => {
+        try {
+          const res = await logoutProfile(); // call the GraphQL logout mutation
+          const { success, message } = res.data.logout;
+      
+          if (success) {
+            await client.clearStore();
 
-    if (loading) return <p className="text-center mt-10 text-2xl text-[#7a4f0a]">Loading...</p>;
-    if (error) return <p className="text-center mt-10 text-red-600">Error loading profile!</p>;
+            toast.success(message || "Logged out successfully!");
+            // wait a bit to let the toast show, then redirect
+            setTimeout(() => {
+              navigate("/"); // go back to login/home page
+            }, 1000);
+          } else {
+            toast.error(message || "Logout failed!");
+          }
+        } catch (err) {
+          console.error("Logout error:", err);
+          toast.error("Logout failed! Please try again.");
+        }
+      };
+      
+
+    if (loading)
+        return (
+            <p className="text-center mt-10 text-lg">Loading Profile...</p>
+        );
+
+    if (error) {
+        if (error.message.includes("Not authenticated")) {
+            return (
+                <div>
+                    <p className="text-center mt-10 text-lg text-red-600">
+                        You need to log in to view this page
+                    </p>
+                    <p className="text-center mt-10 text-lg text-red-600">
+                        You will be redirected to the login page in 2 seconds
+                    </p>
+                </div>
+            );
+        }
+        return (
+            <p className="text-center mt-10 text-lg text-red-600">
+                An error occurred
+            </p>
+        );
+    }
+
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-b from-[#8dc9c0] via-[#f7b96a] to-[#f9a62b] text-[#7a4f0a] select-none font-['Fredoka_One']">
-            <ToastContainer />
+            {/* <ToastContainer />` */}
             <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
                 <div className="w-[420px] p-6 rounded-3xl bg-[#fce9b8] border-4 border-[#7f4f0a] shadow-[6px_6px_0_0_#7f4f0a]">
 
