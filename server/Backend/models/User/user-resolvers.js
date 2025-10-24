@@ -1,7 +1,9 @@
 import Authenticator from '../../controllers/Authenticator.js'; // FIX: correct relative import
 import { Check_login_info } from '../../controllers/Check_login_info.js';
 import { getUserModel } from '../../utils/getUserModel.js'; // FIX: correct relative import
-import isloggedin from "../../middleware/isloggedIn.js"
+import { v4 as uuidv4 } from 'uuid';
+
+
 
 const resolvers = {
     Query: {
@@ -57,7 +59,6 @@ const resolvers = {
                     // const checking=Check_login_info(fetchedinfo,context,is_this_a_user);
                     const result = await Check_login_info(fetchedinfo, context, is_this_a_user);
                     return result;
-
                 } else {
                     return {
                         success: false,
@@ -73,6 +74,16 @@ const resolvers = {
 
 
         },
+
+        finduser_and_savematch:async (parent, args, context) => {
+            console.log(args.input);
+            const user1 = await UserModel.findOne({ username: args.input[0] });
+            const user2 = await UserModel.findOne({ username: args.input[1] });
+            const matchId = uuidv4();
+
+
+        },
+
         user_creation: async (parent, args) => {
             try {
                 const UserModel = getUserModel('Users');

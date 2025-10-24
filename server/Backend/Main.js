@@ -12,7 +12,6 @@ import userresolvers from './models/User/user-resolvers.js'
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { mergeResolvers } from '@graphql-tools/merge';
 import isloggedin from './middleware/isloggedIn.js';
-
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { expressMiddleware } from '@as-integrations/express4';
@@ -170,7 +169,7 @@ const roomName = ['room1', 'room2'];
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  socket.on('joinRoom', () => {
+  socket.on('joinRoom', async () => {
     for (let index = 0; index < roomName.length; index++) {
       const roomname = roomName[index];
       if (roomData[roomname] && io.sockets.adapter.rooms.get(roomname)) {
@@ -184,9 +183,16 @@ io.on('connection', (socket) => {
           }
           roomData[roomname].players.push(players.player2)
           roomData[roomname].status = 'ready';
+          let roominfo=roomData[roomname];
+          let usernames=roominfo.players.map(player => player.username)
 
-          // console.log(roomData[roomname])
-          io.to(roomname).emit('2players_connected');
+          const users = await userresolvers.Mutation.finduser_and_savematch(
+            null, // parent
+            { input: usernames}, // args
+          );
+          
+          
+          io.to(roomname).emit('2players_connected',{ roominfo });
 
           const playerData = roomData[roomname].players.map(p => ({
             username: p.username,

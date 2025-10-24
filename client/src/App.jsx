@@ -52,8 +52,8 @@ const App = () => {
             {/* <Route path="/gamepage" element={<Gamingpage />} /> */}
             <Route path="/signup" element={<Singup />} />
 
-            {/* <Route path="/page2" element={<Secondpage />} /> */}
-            <Route path="/page2" element={<Mainmenu />} />
+            <Route path="/page2" element={<Secondpage />} />
+            {/* <Route path="/page2" element={<Mainmenu />} /> */}
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
