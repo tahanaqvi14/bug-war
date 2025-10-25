@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState,useContext } from 'react';
-import './css/game.css';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import './css/codeeditor.css';
 import { SocketContext } from '../App';
 import { useQuery, gql, useLazyQuery } from "@apollo/client";
 
@@ -37,6 +37,8 @@ const CodeEditor = () => {
   // Refs only for Monaco editor container
   const containerRef = useRef(null);
   const editorRef = useRef(null);
+  const outputRef = useRef(null); // 👈 new ref for the output box
+  const [timeLeft, setTimeLeft] = useState(5 * 60 + 23); // 5:23 initially
 
   // State for UI
   const [code, setCode] = useState("//write code here");
@@ -51,7 +53,7 @@ const CodeEditor = () => {
 
   // Load Monaco editor once
   useEffect(() => {
-    if (socket){
+    if (socket) {
       console.log(`Socket connected in codeeditor component:${socket.id}`);
     }
 
@@ -70,20 +72,45 @@ const CodeEditor = () => {
         });
 
         window.require(["vs/editor/editor.main"], () => {
+          // 🏜️ Define your custom desert-light theme
+          window.monaco.editor.defineTheme("desertLight", {
+            base: "vs", // start from light theme
+            inherit: true,
+            rules: [
+              { token: "", foreground: "4B2E05", background: "FCE9B8" }, // default text
+              { token: "keyword", foreground: "A65304", fontStyle: "bold" },
+              { token: "number", foreground: "B06A14" },
+              { token: "string", foreground: "A64B2A" },
+              { token: "comment", foreground: "8B7E6A", fontStyle: "italic" },
+              { token: "function", foreground: "C75B12" },
+              { token: "type", foreground: "A65304" },
+            ],
+            colors: {
+              "editor.background": "#FCE9B8",
+              "editor.foreground": "#4B2E05",
+              "editorCursor.foreground": "#7A4F0A",
+              "editor.lineHighlightBackground": "#F8DFA7",
+              "editorLineNumber.foreground": "#C18C46",
+              "editor.selectionBackground": "#F7D48B",
+              "editor.inactiveSelectionBackground": "#F7D48B66",
+              "editorBracketMatch.background": "#F8E0A3",
+              "editorBracketMatch.border": "#C18C46",
+              "editorIndentGuide.background": "#EFD7A5",
+              "editorWhitespace.foreground": "#EFD7A5",
+            },
+          });
+
+          // ✨ Create the editor using that theme
           editorRef.current = window.monaco.editor.create(containerRef.current, {
             value: code,
             language: "javascript",
-            theme: "vs-dark",
+            theme: "desertLight", // <-- use your new theme here
             fontFamily: "Fira Code, monospace",
             fontSize: 14,
             minimap: { enabled: false },
-            suggestOnTriggerCharacters: false,
-            quickSuggestions: false,
-            parameterHints: { enabled: false },
-            wordBasedSuggestions: false,
-            snippetSuggestions: "none",
           });
 
+          // 🧹 Remove the loader after init
           const loader = document.getElementById("editor-loader");
           if (loader) loader.remove();
         });
@@ -109,23 +136,35 @@ const CodeEditor = () => {
     } else if (challenge_data && editorRef.current) {
       editorRef.current.setValue(
         `function ${challenge_data.Get_challenge[0].function_name}(){ 
-  // Write your function inside this
+  //Write your function inside this
 }\n`
       );
     }
   }, [challenge_loading, challenge_data]);
 
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft]);
+
+  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+  const seconds = String(timeLeft % 60).padStart(2, "0");
+
+
   const runCode = async (actionType) => {
     const code = editorRef.current.getValue();
     setIsRunning(true);
     setRunningAction(actionType);
-
+    console.log(challenge_data.Get_challenge[0].id_number)
     try {
       const { data } = await getcode({
         variables: { input: { code, challengeid: challenge_data.Get_challenge[0].id_number } },
       });
 
       const msg = data.checking_user_code.message;
+      console.log(msg)
 
       if (msg.consolelogs != null) {
         setOutput(msg.consolelogs.join("\n"));
@@ -160,126 +199,102 @@ const CodeEditor = () => {
   };
 
   return (
-    <div className="bg-[#0A0E17] text-white p-6 min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="font-semibold text-2xl mb-3">Problem Statement</h2>
-        <p className="mb-4 text-sm leading-relaxed">
-          {challenge_loading
-            ? "Loading..."
-            : challenge_data
-            ? challenge_data.Get_challenge[0].problem_statement
-            : "Error or no data"}
-        </p>
-        <p className="mb-4 text-sm leading-relaxed">
-          {challenge_loading
-            ? "Loading..."
-            : challenge_data
-            ? "Make sure to wrap your code in " +
-              challenge_data.Get_challenge[0].function_name +
-              " function"
-            : "Error or no data"}
-        </p>
-        <hr className="border-t border-[#1f2129]" />
-      </div>
-
-      <div className="bg-[#0A0E17] flex items-start justify-center p-4">
-        <div className="w-full max-w-4xl space-y-4">
-          {/* Top bar */}
-          <div className="flex justify-between">
-            <div>
-              <div className="bg-[#0a0e17] border border-[#1f2937] rounded-md text-white text-sm px-3 py-2">
-                JavaScript
+    <div className="maindiv">
+      {/* Countdown and Player Section */}
+      <div className="countdown-page">
+        <div className="main-container">
+          <div className="top-bar">
+            {/* Countdown Section */}
+            <div className="countdown-container">
+              <div
+                className="countdown-clock"
+                style={{ color: timeLeft <= 0 ? "#FF0000" : "var(--sun-yellow)" }}
+              >
+                {timeLeft > 0 ? `${minutes}:${seconds}` : "00:00"}
               </div>
             </div>
-            <div></div>
-            <div className="flex items-center space-x-4">
-              {/* Reset */}
-              <button
-                type="button"
-                onClick={handleReset}
-                className="flex items-center space-x-1 bg-[#0a0e17] border border-[#1f2937] rounded-md text-white text-sm px-3 py-2 hover:bg-[#1f2937]"
-              >
-                <i className="fas fa-redo"></i>
-                <span className="font-semibold">Reset</span>
-              </button>
 
-              {/* Run */}
+            {/* Players Section */}
+            <div className="players-container">
+              <div className="player-card">
+                <div className="position-badge position-3">VU</div>
+                <div className="player-info">
+                  <div className="player-name">VultureDev</div>
+                </div>
+                <span>Points: 0</span>
+              </div>
+
+              <div className="player-card">
+                <div className="position-badge position-4">JS</div>
+                <div className="player-info">
+                  <div className="player-name">JSRacer</div>
+                </div>
+                <span>Points: 0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Editor + Problem Section */}
+      <div className="app-container">
+        {/* Left side */}
+        <div className="problem-section">
+          <h2>Problem Statement</h2>
+          <p>
+            {challenge_loading
+              ? "Loading..."
+              : challenge_data
+                ? challenge_data.Get_challenge[0].problem_statement
+                : "Error loading challenge."}
+          </p>
+          <p>
+            {challenge_loading
+              ? ""
+              : challenge_data
+                ? "Make sure to wrap your code in " +
+                challenge_data.Get_challenge[0].function_name +
+                " function"
+                : ""}
+          </p>
+        </div>
+
+        {/* Right side */}
+        <div className="editor-section">
+          <div className="button-bar">
+            <div className="lang">JavaScript</div>
+            <div className="buttons">
+              <button onClick={handleReset}>Reset</button>
               <button
-                type="button"
                 onClick={() => runCode("run")}
                 disabled={isRunning}
-                className={`flex items-center space-x-1 rounded-md text-white text-sm px-4 py-2 ${
-                  isRunning
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-[#0ea5e9] hover:bg-[#0284c7]"
-                }`}
               >
-                <i className="fas fa-play"></i>
-                <span>
-                  {isRunning && runningAction === "run"
-                    ? "Running..."
-                    : "Run"}
-                </span>
+                {isRunning && runningAction === "run"
+                  ? "Running..."
+                  : "Run"}
               </button>
-
-              {/* Submit */}
               <button
-                type="button"
                 onClick={() => runCode("submit")}
                 disabled={isRunning}
-                className={`flex items-center space-x-1 rounded-md text-white text-sm px-4 py-2 ${
-                  isRunning
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-[#14b8a6] hover:bg-[#0d9488]"
-                }`}
               >
-                <i className="fas fa-paper-plane"></i>
-                <span>
-                  {isRunning && runningAction === "submit"
-                    ? "Submitting..."
-                    : "Submit"}
-                </span>
+                {isRunning && runningAction === "submit"
+                  ? "Submitting..."
+                  : "Submit"}
               </button>
             </div>
           </div>
 
           {/* Monaco container */}
-          <div
-            id="container_main"
-            ref={containerRef}
-            style={{
-              width: "800px",
-              height: "500px",
-              border: "1px solid #ccc",
-              margin: "20px auto",
-            }}
-          >
-            <div
-              id="editor-loader"
-              style={{
-                width: "800px",
-                height: "500px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "white",
-              }}
-            >
-              Loading Editor...
-            </div>
+          <div id="container_main" ref={containerRef}>
+            <div id="editor-loader">Loading Editor...</div>
           </div>
 
-          {/* Output box */}
-          <div
-            className="bg-[#0a0e17] border border-[#1f2937] rounded-md p-4 text-gray-300 max-w-full"
-            aria-label="Output section"
-          >
-            <p className="font-semibold mb-2 text-white">Output</p>
-            <p className="text-sm whitespace-pre-wrap">{output}</p>
-          </div>
+          {/* Output section */}
+          <div className="output" ref={outputRef}>
+            <h3>Output</h3>
+            <pre>{output}</pre>
 
-          {/* Results (was document.getElementById before) */}
-          <div>
+            {/* Show test results */}
             <p>{inputVal}</p>
             <p>{expectedVal}</p>
             <p>{passedVal}</p>

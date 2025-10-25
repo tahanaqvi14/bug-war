@@ -9,6 +9,7 @@ import usertypeDefs from './models/user-type-def.js'
 import challenge_typeDefs from './models/challenge-type-def.js'
 import challenge_resolvers from './models/Challenges/challenge-resolvers.js'
 import userresolvers from './models/User/user-resolvers.js'
+import matchresolvers from './models/Match/match-resolvers.js'
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { mergeResolvers } from '@graphql-tools/merge';
 import isloggedin from './middleware/isloggedIn.js';
@@ -26,11 +27,13 @@ import cors from 'cors';
 export const typeDefs = mergeTypeDefs([
   usertypeDefs,
   challenge_typeDefs,
+  // matchresolvers
 ]);
 
 export const resolvers = mergeResolvers([
   userresolvers,
   challenge_resolvers,
+  // matchresolvers
 ]);
 
 const apolloserver = new ApolloServer({ typeDefs, resolvers });
@@ -167,11 +170,14 @@ const players = {}
 const roomName = ['room1', 'room2'];
 
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-
+  console.log('Client connected:', socket.id)
+  console.log(socket.request.session.user.username)
   socket.on('joinRoom', async () => {
     for (let index = 0; index < roomName.length; index++) {
       const roomname = roomName[index];
+      const username = socket.request.session.user.username
+      socket.emit('welcome', { username });
+
       if (roomData[roomname] && io.sockets.adapter.rooms.get(roomname)) {
         if (io.sockets.adapter.rooms.get(roomname).size < 2 && roomData[roomname].status == 'waiting') {   // used to retrieve a Set of socket.ids that are currently connected to a specific room.
           socket.join(roomname);
@@ -186,13 +192,12 @@ io.on('connection', (socket) => {
           let roominfo=roomData[roomname];
           let usernames=roominfo.players.map(player => player.username)
 
-          const users = await userresolvers.Mutation.finduser_and_savematch(
+          const matchinfo = await matchresolvers.Mutation.createMatch(
             null, // parent
             { input: usernames}, // args
-          );
+          )
           
-          
-          io.to(roomname).emit('2players_connected',{ roominfo });
+          io.to(roomname).emit('2players_connected',{ matchinfo });
 
           const playerData = roomData[roomname].players.map(p => ({
             username: p.username,

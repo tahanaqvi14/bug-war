@@ -3,11 +3,13 @@ import mongoose from 'mongoose'
 // utils/getUserModel.js
 import userSchema from '../models/user.js';
 import challengeSchema from '../models/challenge.js';
+import matchSchema from '../models/match.js';
 
 
 const schemaMap = {
   Users: userSchema,
   Challenges: challengeSchema,
+  Matches:matchSchema
 };
 
 // This object remembers created models (to avoid errors or duplicate models)

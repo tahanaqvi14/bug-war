@@ -47,8 +47,9 @@ const App = () => {
 
             {/* Pass connectSocket down to Login */}
             {/* <Route path="/" element={<Login connectSocket={connectSocket} />} /> */}
-            <Route path="/codeeditor" element={<CodeEditor />} />
-            <Route path="/" element={<Login connectSocket={connectSocket} />} />
+            {/* <Route path="/codeeditor" element={<CodeEditor />} /> */}
+            <Route path="/" element={<CodeEditor />} />
+            {/* <Route path="/" element={<Login connectSocket={connectSocket} />} /> */}
             {/* <Route path="/gamepage" element={<Gamingpage />} /> */}
             <Route path="/signup" element={<Singup />} />
 

@@ -12,8 +12,9 @@ const challenge_resolvers = {
         checking_user_code: async (parent, args) => {
             const ChallengeModel = getUserModel('Challenges')
             const challenge = await ChallengeModel.find({ id_number: args.input.challengeid })
+            console.log(challenge)
             const result = Code(args.input.code,challenge)
-            return result
+            return result;
         }
     }
 };

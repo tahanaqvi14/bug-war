@@ -29,7 +29,7 @@ const challenge_typeDefs = gql`
     type CodeResponse {
         success: Boolean!
         message: TestCase
-    }    
+    }
 
 `
 export default challenge_typeDefs;

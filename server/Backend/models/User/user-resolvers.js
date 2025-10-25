@@ -1,7 +1,7 @@
 import Authenticator from '../../controllers/Authenticator.js'; // FIX: correct relative import
 import { Check_login_info } from '../../controllers/Check_login_info.js';
 import { getUserModel } from '../../utils/getUserModel.js'; // FIX: correct relative import
-import { v4 as uuidv4 } from 'uuid';
+
 
 
 
@@ -75,14 +75,7 @@ const resolvers = {
 
         },
 
-        finduser_and_savematch:async (parent, args, context) => {
-            console.log(args.input);
-            const user1 = await UserModel.findOne({ username: args.input[0] });
-            const user2 = await UserModel.findOne({ username: args.input[1] });
-            const matchId = uuidv4();
 
-
-        },
 
         user_creation: async (parent, args) => {
             try {
