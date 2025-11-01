@@ -6,14 +6,14 @@ const challenge_resolvers = {
     Query: {
         Get_challenge: async () => {
             const ChallengeModel = getUserModel('Challenges')
-            const challenge = await ChallengeModel.find({ id_number: Math.floor(Math.random() * 2) + 1 })
+            // const challenge = await ChallengeModel.find({ id_number: Math.floor(Math.random() * 2) + 1 })
+            const challenge = await ChallengeModel.find({ id_number: 1})
             return challenge;
         },
         checking_user_code: async (parent, args) => {
             const ChallengeModel = getUserModel('Challenges')
             const challenge = await ChallengeModel.find({ id_number: args.input.challengeid })
-            console.log(challenge)
-            const result = Code(args.input.code,challenge)
+            const result = await Code(args.input.code,challenge)
             return result;
         }
     }

@@ -1,76 +1,103 @@
-import { NodeVM, VM } from 'vm2';
+import { NodeVM } from 'vm2';
+import vm from 'vm';
 
-const Code = async (userCode,challengeinfo) => {
-    // Step 1: Pre-validate syntax with VM class
-    
+const Code = async (userCode, challengeinfo) => {
+    // Step 1: Pre-validate syntax with vm  class
     try {
-        const syntaxVM = new VM({ timeout: 1000 });
-        syntaxVM.run(userCode);
+        new vm.Script(userCode);
     } catch (syntaxError) {
+        console.log('Syntax error caught:', syntaxError);
         return {
             success: false,
-            message:{
-                message:`Syntax Error: ${syntaxError.message}`,
-            }
+            message: {
+                message: `Syntax Error: ${syntaxError.message}`,
+            },
         };
     }
 
-    const vm = new NodeVM({
+
+    const vmInstance = new NodeVM({
         console: 'redirect',
-        timeout: 2000,       
+        timeout: 2000,
         sandbox: {},
+        require: {
+            external: false,
+            builtin: [],
+        },
     });
 
     let logs = [];
-    vm.on('console.log', (msg) => logs.push(msg));
-    
-    const testCases = [
-        { input: challengeinfo[0].testcase, expected:challengeinfo[0].expected },
-    ];
+    vmInstance.on('console.log', (msg) => logs.push(msg));
+
+    let results = [];
+    let overallPassed = true;
+
 
     try {
         // Ensure the user code exports the function
-        const userFunction = vm.run(`
+        const userFunction = vmInstance.run(`
             ${userCode}
             module.exports = ${challengeinfo[0].function_name};
         `);
 
         // Execute test cases
-        const results = testCases.map((tc) => {
-            const output = userFunction(...tc.input);
-            return {
-                input: tc.input,
+        // const results = testCases.map((tc) => {
+        //     const output = userFunction(...tc.input);
+        //     return {
+        //         input: tc.input,
+        //         expected: tc.expected,
+        //         output,
+        //         passed: output === tc.expected,
+        //     };
+        // });
+
+        // Execute test cases
+        for (const tc of challengeinfo[0].testcase.values()) {
+            let output, passed, error = null;
+            output = userFunction(...tc.case);
+            if (output === tc.expected) {
+                passed = true;
+            } else {
+                passed = false;
+                output = null;
+                passed = false;
+            }
+            results.push({
+                case: tc.case,
                 expected: tc.expected,
-                output,
-                passed: output === tc.expected,
-            };
-        });
+                output: output === undefined ? null : output,
+                passed,
+                error,
+            });
+        }
+
+
 
         let pass = 0;
-
         for (let element of results) {
             if (element.passed == true) {
                 pass += 1;
             }
         }
-
         if (pass == 1) {
             return {
                 success: true,
                 message: {
-                    input: results[0].input,
+                    input: results[0].case,
                     expected: results[0].expected,
                     output: results[0].output,
                     passed: true,
+                    results,
                     // message: "Output did match expected",
                     ...(logs.length > 0 && { consolelogs: logs.map(item => item) })
                 }
             }
         } else {
             return {
-                success: false,
+                success: true,
                 message: {
-                    input: results[0].input,
+                    results,
+                    input: results[0].case,
                     expected: results[0].expected,
                     output: results[0].output,
                     passed: false,
@@ -84,7 +111,8 @@ const Code = async (userCode,challengeinfo) => {
         return {
             success: false,
             message: {
-                message:`Runtime Error: ${error.message}`},
+                message: `Runtime Error: ${error.message}`
+            },
         };
     }
 };

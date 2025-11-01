@@ -1,5 +1,5 @@
 import express from 'express';
-import dotenv from 'dotenv';// Load variables from .env
+import dotenv from 'dotenv';
 import connectDB from './DB/Connection.js'
 import cookieParser from 'cookie-parser';
 // import { RedisStore } from 'connect-redis';
@@ -171,7 +171,6 @@ const roomName = ['room1', 'room2'];
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id)
-  console.log(socket.request.session.user.username)
   socket.on('joinRoom', async () => {
     for (let index = 0; index < roomName.length; index++) {
       const roomname = roomName[index];
@@ -179,7 +178,7 @@ io.on('connection', (socket) => {
       socket.emit('welcome', { username });
 
       if (roomData[roomname] && io.sockets.adapter.rooms.get(roomname)) {
-        if (io.sockets.adapter.rooms.get(roomname).size < 2 && roomData[roomname].status == 'waiting') {   // used to retrieve a Set of socket.ids that are currently connected to a specific room.
+        if (io.sockets.adapter.rooms.get(roomname).size < 2 && roomData[roomname].status == 'waiting') {// used to retrieve a Set of socket.ids that are currently connected to a specific room.
           socket.join(roomname);
           players.player2 = {
             username: socket.request.session.user.username,
@@ -189,25 +188,21 @@ io.on('connection', (socket) => {
           }
           roomData[roomname].players.push(players.player2)
           roomData[roomname].status = 'ready';
-          let roominfo=roomData[roomname];
-          let usernames=roominfo.players.map(player => player.username)
+          let roominfo = roomData[roomname];
+          let usernames = roominfo.players.map(player => player.username)
 
           const matchinfo = await matchresolvers.Mutation.createMatch(
             null, // parent
-            { input: usernames}, // args
+            { input: usernames }, // args
           )
-          
-          io.to(roomname).emit('2players_connected',{ matchinfo });
-
+          io.to(roomname).emit('2players_connected', { matchinfo });
           const playerData = roomData[roomname].players.map(p => ({
             username: p.username,
             score: p.score
           }));
-
           setTimeout(() => {
             io.to(roomname).emit('Gaming_screen', { playerData });
           }, 6000);
-
           break;
         }
       } else if (Object.keys(roomData).length == 2) {
@@ -226,10 +221,37 @@ io.on('connection', (socket) => {
           room: roomname,
         };
         roomData[roomname].players.push(players.player1)
+        console.log(roomData)
+        console.log(players)
         break;
       }
     }
-  });
+  })
+
+  socket.on('cancel_search', (socket) => {
+    let playerRoom;
+    for (let index in roomData) {
+      const index1 = roomData[index].players.findIndex(
+        p => p.socketID == socket
+      );
+      if (index1 > -1) {
+        roomData[index].players.splice(index1, 1);
+        if (roomData[index].players.length == 0) {
+          delete roomData[index];
+        } else {
+          // io.to(index).emit('other_player_left');
+        }
+      }
+    }
+    for (const key in players) {
+      if (players[key].socketID === socket) {
+        console.log(players[key])
+        playerRoom = players[key].room;
+        delete players[key];
+        break;
+      }
+    }
+  })
 
   socket.on('disconnect', () => {
     console.log(`User ${socket.id} disconnected. Reason:`);
@@ -246,6 +268,14 @@ io.on('connection', (socket) => {
         } else {
           // io.to(index).emit('other_player_left');
         }
+      }
+    }
+    for (const key in players) {
+      if (players[key].socketID === socket) {
+        console.log(players[key])
+        playerRoom = players[key].room;
+        delete players[key];
+        break;
       }
     }
   })

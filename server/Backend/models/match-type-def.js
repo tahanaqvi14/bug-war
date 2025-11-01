@@ -14,6 +14,7 @@ const match_typeDefs = gql`
         status:String
     }
 
+
     
     input ParticipantInput {
         username: String!
@@ -30,7 +31,9 @@ const match_typeDefs = gql`
         createMatch(input: MatchInput!): Match!
         updateWinner(matchId: String!, winner: String!): Match!
     }
-   
 
+    type Query{
+        Get_matchinfo:[Match]
+    }
 `
 export default match_typeDefs;

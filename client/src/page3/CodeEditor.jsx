@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './css/codeeditor.css';
 import { SocketContext } from '../App';
 import { useQuery, gql, useLazyQuery } from "@apollo/client";
+import { useStore  } from '../../store/Store';
 
 const GET_CHALLENGE = gql`
   query Get_challenge {
@@ -12,28 +14,49 @@ const GET_CHALLENGE = gql`
     }
   }
 `;
+// const Get_match=gql`
+//   query Get_matchinfo{
+//   Get_matchinfo{
+//     participants
+//     winner
+//     matchId
+//     }
+//   }
+// `;
 
 const GET_RESULT_OF_CODE = gql`
   query checking_user_code($input: checking_code!) {
     checking_user_code(input: $input) {
       success
       message {
-        input
-        expected
-        output
         passed
         message
         consolelogs
+        results {
+          case
+          expected
+          output
+          passed
+        }
       }
     }
   }
 `;
 
 const CodeEditor = () => {
-  const socket = useContext(SocketContext);
+  const matchinfo = useStore((state) => state.data);
+  console.log(matchinfo);
+  const socket = useContext(SocketContext)
+
+
   const { data: challenge_data, loading: challenge_loading, error: challenge_error } = useQuery(GET_CHALLENGE);
+  // const { data: match_data, loading: match_loading, error: match_error } = useQuery(Get_match);
+  // console.log(match_data)
   const [getcode] = useLazyQuery(GET_RESULT_OF_CODE);
 
+  const [result, setresult] = useState([]);
+  const [consolelogs, setconsolelogs] = useState([]);
+  
   // Refs only for Monaco editor container
   const containerRef = useRef(null);
   const editorRef = useRef(null);
@@ -45,11 +68,6 @@ const CodeEditor = () => {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [runningAction, setRunningAction] = useState(null);
-
-  // 👇 instead of document.getElementById
-  const [inputVal, setInputVal] = useState('');
-  const [expectedVal, setExpectedVal] = useState('');
-  const [passedVal, setPassedVal] = useState('');
 
   // Load Monaco editor once
   useEffect(() => {
@@ -113,9 +131,8 @@ const CodeEditor = () => {
           // 🧹 Remove the loader after init
           const loader = document.getElementById("editor-loader");
           if (loader) loader.remove();
-        });
-      };
-
+        })
+      }
       document.body.appendChild(loaderScript);
     }
 
@@ -162,26 +179,38 @@ const CodeEditor = () => {
       const { data } = await getcode({
         variables: { input: { code, challengeid: challenge_data.Get_challenge[0].id_number } },
       });
+      console.log(data.checking_user_code);
+      // if(data.checking_user_code.message.results.)
+      setresult(data.checking_user_code)
 
-      const msg = data.checking_user_code.message;
-      console.log(msg)
 
-      if (msg.consolelogs != null) {
-        setOutput(msg.consolelogs.join("\n"));
-
-      } else if (msg.message) {
-        setOutput(msg.message);
+      if (data.checking_user_code.message.consolelogs && data.checking_user_code.message.consolelogs.length > 0) {
+        let a=data.checking_user_code.message.consolelogs;
+        let a1 = a.slice(0, Math.floor(a.length / 2));
+        console.log('results',a1);
+        setconsolelogs(a1);
       }
+      
+      // const msg = data.checking_user_code.message;
+      // console.log(msg)
 
-      setInputVal(msg.input ? `Input: ${msg.input}` : '');
-      setExpectedVal(msg.expected ? `Expected output: ${msg.expected}` : '');
-      setPassedVal(
-        msg.passed != null
-          ? msg.passed
-            ? "✅ Test cases Passed\n\n"
-            : "❌ Test cases Failed\n\n"
-          : ''
-      );
+      // if (msg.consolelogs != null) {
+      //   setOutput(msg.consolelogs.join("\n"));
+
+      // } else if (msg.message) {
+      //   setOutput(msg.message);
+      // }
+
+      // setInputVal(msg.input ? `Input: ${msg.input}` : '');
+      // setExpectedVal(msg.expected ? `Expected output: ${msg.expected}` : '');
+      // setPassedVal(
+      //   msg.passed != null
+      //     ? msg.passed
+      //       ? "✅ Test cases Passed\n\n"
+      //       : "❌ Test cases Failed\n\n"
+      //     : ''
+      // );
+
     } catch (err) {
       setOutput("Fetch error: " + err.message);
     } finally {
@@ -293,11 +322,33 @@ const CodeEditor = () => {
           <div className="output" ref={outputRef}>
             <h3>Output</h3>
             <pre>{output}</pre>
+            <p>{result.success === false && result.message.message}</p>
 
             {/* Show test results */}
-            <p>{inputVal}</p>
+            <div className="flex gap-4">
+              {result?.message?.results?.map((item, index) => (
+                <div key={index}>
+                  <p className="font-semibold">
+                    Case: {item["case"].join(", ")}
+                  </p>
+                  <p>Expected: {item.expected}</p>
+                  <p>Output: {item.output === null ? "undefined (no return value)" : item.output}
+                  </p>
+                  <p className="mt-2 font-bold">
+                    {item.passed ? "✅ Test Passed" : "❌ Test Failed"}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className='mt-4'>
+              <p>Console Logs:</p>
+              <pre>{consolelogs.join("\n")}</pre>
+            </div>
+
+            {/* <p>{inputVal}</p>
             <p>{expectedVal}</p>
-            <p>{passedVal}</p>
+            <p>{passedVal}</p> */}
+
           </div>
         </div>
       </div>

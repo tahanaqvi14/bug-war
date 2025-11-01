@@ -1,12 +1,14 @@
 // if (loading) return <p>Loading...</p>;
 // if (error) return <p>Error: {error.message}</p>;
-import React,{useEffect} from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import "./Mainmenu.css";
 import { useQuery, gql } from '@apollo/client';
 import profile from "./images/profile.svg";
 import game from "./images/game.svg";
 import trophy from "./images/trophy.svg";
 import { useNavigate } from 'react-router-dom';
+import Secondpage from "./Secondpage";
+
 
 const DISPLAY_NAME_QUERY = gql`
   query MainMenu {
@@ -18,6 +20,8 @@ const DISPLAY_NAME_QUERY = gql`
 
 const Mainmenu = () => {
   const navigate = useNavigate();
+  const [showCard, setShowCard] = useState(false);
+
   const { loading, error, data } = useQuery(DISPLAY_NAME_QUERY);
   const displayname = data?.Main_menu?.displayname;
 
@@ -89,7 +93,7 @@ const Mainmenu = () => {
                   Begin a new coding <br />
                   <span>challenge</span>
                 </div>
-                <a href="#" className="play-btn">
+                <a onClick={() => setShowCard(true)} className="play-btn">
                   Play Now
                 </a>
               </div>
@@ -115,6 +119,26 @@ const Mainmenu = () => {
           </div>
         </div>
       </div>
+      {/* 💳 Show the card when button clicked */}
+      {showCard && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <Secondpage onClose={() => setShowCard(false)}/>
+        </div>
+      )}
+
     </div>
   );
 };
