@@ -18,7 +18,6 @@ const user=mongoose.Schema({
         type:String,
         required:true,
         minlength:8,
-        
         trim:true,//Removes leading/trailing whitespace automatically before saving.
     },
     points: {
@@ -33,13 +32,17 @@ const user=mongoose.Schema({
         type: [String], // or Number if just a count
         default: []
     },
+    sessiontoken:{
+        type:Boolean,
+        default:false
+    },
     totalWins: {
         type: Number,
         default: 0
     },
     total_matches: {
-        type: Number,
-        default: 0
+        type: [String], // or Number if just a count
+        default: []
     }
 })
 // const User = mongoose.model('User', userSchema);

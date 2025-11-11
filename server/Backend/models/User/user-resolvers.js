@@ -8,7 +8,7 @@ import { getUserModel } from '../../utils/getUserModel.js'; // FIX: correct rela
 const resolvers = {
     Query: {
         LeaderBoard_Info: async (parent, args, context) => {
-            if (context.loggedIn==false) {
+            if (context.loggedIn == false) {
                 throw new Error("Not authenticated");
             }
             const UserModel = getUserModel('Users');
@@ -28,7 +28,7 @@ const resolvers = {
             // } else {
             //     console.log(is_user_authenticated);
             // }
-            if (context.loggedIn==false) {
+            if (context.loggedIn == false) {
                 throw new Error("Not authenticated");
             }
             const UserModel = getUserModel('Users');
@@ -38,7 +38,7 @@ const resolvers = {
         },
 
         Main_menu: async (parent, args, context) => {
-            if (context.loggedIn==false) {
+            if (context.loggedIn == false) {
                 throw new Error("Not authenticated");
             }
             const UserModel = getUserModel('Users');
@@ -56,9 +56,22 @@ const resolvers = {
                 const username = fetchedinfo.username;
                 let is_this_a_user = await UseruserModel.findOne({ username: username });
                 if (is_this_a_user != null) {
+                    if (is_this_a_user.sessiontoken == false) {
+                        const result = await Check_login_info(fetchedinfo, context, is_this_a_user);
+                        console.log(result)
+                        if(result.success==true){
+                            is_this_a_user.sessiontoken = true;
+                            await is_this_a_user.save();
+                        }
+                        return result;
+                    }
+                    else {
+                        return {
+                            success: false,
+                            message: "User already loggedin"
+                        }
+                    }
                     // const checking=Check_login_info(fetchedinfo,context,is_this_a_user);
-                    const result = await Check_login_info(fetchedinfo, context, is_this_a_user);
-                    return result;
                 } else {
                     return {
                         success: false,
@@ -117,6 +130,15 @@ const resolvers = {
 
         logout: async (parent, args, context) => {
             try {
+                const UserModel = getUserModel('Users');
+                const updatedUser = await UserModel.findOneAndUpdate(
+                    { username: context.req.session.user.username },
+                    {
+                        sessiontoken: false,
+                    },
+                    { new: true }
+                );
+
                 // --- Destroy session ---
                 if (context.req.session) {
                     await new Promise((resolve, reject) => {
@@ -130,22 +152,22 @@ const resolvers = {
                         });
                     });
                 }
-        
+
                 // --- Clear JWT cookie ---
                 context.res.clearCookie("token", {
                     httpOnly: true,
                     sameSite: "lax",
                     secure: process.env.NODE_ENV === "production", // should be true in production
                 });
-        
+
                 // --- Clear username cookie (if you set one) ---
                 context.res.clearCookie("username", {
                     sameSite: "lax",
                     secure: process.env.NODE_ENV === "production",
                 });
-        
+
                 console.log("✅ User logged out successfully");
-        
+
                 return {
                     success: true,
                     message: "Logout successful",
@@ -158,16 +180,29 @@ const resolvers = {
                 };
             }
         },
-        
+
+        remove:async (parent, args, context) => {
+            console.log(args);
+            let usernames = args.usernames;
+            const UserModel = getUserModel('Users');
+            const updatedUser = await UserModel.findOneAndUpdate(
+                { username: usernames },
+                {
+                    sessiontoken: false,
+                },
+                { new: true }
+            );
+            return updatedUser;
+        },
+
 
         Update: async (parent, args, context) => {
-            console.log(args.input);
             try {
                 // const { user } = context;
                 // if (!user || !user.username) {
                 //     throw new Error('User not authenticated');
                 // }
-                
+
                 const UserModel = getUserModel('Users');
                 const fetchedinfo = args.input;
 

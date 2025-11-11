@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import './css/codeeditor.css';
 import { SocketContext } from '../App';
 import { useQuery, gql, useLazyQuery } from "@apollo/client";
-import { useStore  } from '../../store/Store';
+import { useStore } from '../../store/Store';
+import Navbar from './Navbar';
+import Popup from './Popup'
 
 const GET_CHALLENGE = gql`
   query Get_challenge {
@@ -13,7 +15,9 @@ const GET_CHALLENGE = gql`
       id_number
     }
   }
-`;
+`
+
+
 // const Get_match=gql`
 //   query Get_matchinfo{
 //   Get_matchinfo{
@@ -44,24 +48,22 @@ const GET_RESULT_OF_CODE = gql`
 `;
 
 const CodeEditor = () => {
-  const matchinfo = useStore((state) => state.data);
-  console.log(matchinfo);
-  const socket = useContext(SocketContext)
 
-
-  const { data: challenge_data, loading: challenge_loading, error: challenge_error } = useQuery(GET_CHALLENGE);
+  const socket = useContext(SocketContext);
+  const navigate = useNavigate();
+  const [getChallenge, { data: challenge_data, loading: challenge_loading, error: challenge_error }] = useLazyQuery(GET_CHALLENGE);
   // const { data: match_data, loading: match_loading, error: match_error } = useQuery(Get_match);
   // console.log(match_data)
   const [getcode] = useLazyQuery(GET_RESULT_OF_CODE);
 
   const [result, setresult] = useState([]);
   const [consolelogs, setconsolelogs] = useState([]);
-  
+  // const [player, setplayerinfo] = useState([])
+
   // Refs only for Monaco editor container
   const containerRef = useRef(null);
   const editorRef = useRef(null);
   const outputRef = useRef(null); // 👈 new ref for the output box
-  const [timeLeft, setTimeLeft] = useState(5 * 60 + 23); // 5:23 initially
 
   // State for UI
   const [code, setCode] = useState("//write code here");
@@ -69,12 +71,28 @@ const CodeEditor = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [runningAction, setRunningAction] = useState(null);
 
+
+  const [message, setmessage] = useState('');
   // Load Monaco editor once
+  const matchinfo = useStore((state) => state.data);
+
+  const [showCard, setShowCard] = useState(false);
   useEffect(() => {
+    getChallenge();
     if (socket) {
       console.log(`Socket connected in codeeditor component:${socket.id}`);
     }
 
+    socket.on('other_player_left',()=>{
+
+      setShowCard(true);
+      setTimeout(() => {
+        navigate('/page2')
+      }, 7000);
+
+    })
+    // setplayerinfo(matchinfo.participants)
+    //  showCard
     let loaderScript;
 
     if (!window.monaco) {
@@ -160,15 +178,6 @@ const CodeEditor = () => {
   }, [challenge_loading, challenge_data]);
 
 
-  useEffect(() => {
-    if (timeLeft <= 0) return;
-    const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [timeLeft]);
-
-  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-  const seconds = String(timeLeft % 60).padStart(2, "0");
-
 
   const runCode = async (actionType) => {
     const code = editorRef.current.getValue();
@@ -183,14 +192,39 @@ const CodeEditor = () => {
       // if(data.checking_user_code.message.results.)
       setresult(data.checking_user_code)
 
+      if (actionType === 'submit') {
+        if (data.checking_user_code.message.passed == true) {
+          setmessage('🟢 Accepted — All test cases passed! 🎉')
+          socket.emit('next_challenge', socket.id, matchinfo)
+
+          // await getChallenge();
+
+          // let funcName = challengeData.Get_challenge[0].function_name;
+          // let initialCode = `function ${funcName}() {\n  // Write your code here\n}`;
+          // setCode(initialCode);
+          // editorRef.current.setValue(initialCode);
+
+          setTimeout(() => {
+            setOutput("");
+            setconsolelogs([]);
+            setresult([]);
+            setmessage("");
+          }, 1000);
+
+
+        }
+        else {
+          setmessage('🔴 Unaccepted — Outputs didn’t match expected results. 🤔')
+        }
+      }
 
       if (data.checking_user_code.message.consolelogs && data.checking_user_code.message.consolelogs.length > 0) {
-        let a=data.checking_user_code.message.consolelogs;
+        let a = data.checking_user_code.message.consolelogs;
         let a1 = a.slice(0, Math.floor(a.length / 2));
-        console.log('results',a1);
+        console.log('results', a1);
         setconsolelogs(a1);
       }
-      
+
       // const msg = data.checking_user_code.message;
       // console.log(msg)
 
@@ -221,7 +255,7 @@ const CodeEditor = () => {
 
   const handleReset = () => {
     const initialCode = `function ${challenge_data.Get_challenge[0].function_name}(){
-  //Write your function inside this
+    //Write your function inside this
 }\n`;
     setCode(initialCode);
     if (editorRef.current) editorRef.current.setValue(initialCode);
@@ -230,40 +264,7 @@ const CodeEditor = () => {
   return (
     <div className="maindiv">
       {/* Countdown and Player Section */}
-      <div className="countdown-page">
-        <div className="main-container">
-          <div className="top-bar">
-            {/* Countdown Section */}
-            <div className="countdown-container">
-              <div
-                className="countdown-clock"
-                style={{ color: timeLeft <= 0 ? "#FF0000" : "var(--sun-yellow)" }}
-              >
-                {timeLeft > 0 ? `${minutes}:${seconds}` : "00:00"}
-              </div>
-            </div>
-
-            {/* Players Section */}
-            <div className="players-container">
-              <div className="player-card">
-                <div className="position-badge position-3">VU</div>
-                <div className="player-info">
-                  <div className="player-name">VultureDev</div>
-                </div>
-                <span>Points: 0</span>
-              </div>
-
-              <div className="player-card">
-                <div className="position-badge position-4">JS</div>
-                <div className="player-info">
-                  <div className="player-name">JSRacer</div>
-                </div>
-                <span>Points: 0</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Navbar />
 
       {/* Main Editor + Problem Section */}
       <div className="app-container">
@@ -344,15 +345,33 @@ const CodeEditor = () => {
               <p>Console Logs:</p>
               <pre>{consolelogs.join("\n")}</pre>
             </div>
-
-            {/* <p>{inputVal}</p>
-            <p>{expectedVal}</p>
-            <p>{passedVal}</p> */}
+            <div className='mt-4'>
+              <p>{message}</p>
+            </div>
 
           </div>
         </div>
       </div>
+      {showCard && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}>
+          <Popup onClose={() => setShowCard(false)} />
+        </div>
+      )}
     </div>
+
+
   );
 };
 

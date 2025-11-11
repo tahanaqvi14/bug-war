@@ -14,6 +14,7 @@ const challenge_resolvers = {
             const ChallengeModel = getUserModel('Challenges')
             const challenge = await ChallengeModel.find({ id_number: args.input.challengeid })
             const result = await Code(args.input.code,challenge)
+            console.log(result)
             return result;
         }
     }

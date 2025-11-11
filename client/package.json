@@ -25,6 +25,7 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "graphql": "^16.11.0",
+    "gsap": "^3.13.0",
     "http": "^0.0.1-security",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",

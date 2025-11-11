@@ -45,7 +45,7 @@ const Secondpage = ({ onClose }) => {
   // 🔴 Cancel search handler
   const handleCancelSearch = () => {
     if (socket) {
-      socket.emit('cancel_search', socket.id);
+      socket.emit('cancel_search', socket.id)
       onClose(); // this will hide the overlay in Mainmenu
       console.log('Cancel search emitted:', socket.id);
     }
@@ -59,8 +59,7 @@ const Secondpage = ({ onClose }) => {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-      }}
-    >
+      }}>
 
       <div
         style={{

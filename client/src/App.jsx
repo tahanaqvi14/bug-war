@@ -13,7 +13,7 @@ import CodeEditor from './page3/CodeEditor';
 import Mainmenu from './page2/Mainmenu'
 import Leaderboard from './page2/Leaderboard';
 import Profile from './page2/Profile';
-
+import Popup from './page3/Popup';
 
 // Create Socket.IO context to share socket instance
 export const SocketContext = createContext();
@@ -46,10 +46,10 @@ const App = () => {
           <Routes>
 
             {/* Pass connectSocket down to Login */}
-            {/* <Route path="/" element={<Login connectSocket={connectSocket} />} /> */}
+            {/* <Route path="/" element={<Popup />} /> */}
             <Route path="/" element={<Login connectSocket={connectSocket} />} />
             <Route path="/codeeditor" element={<CodeEditor />}/>
-            <Route path="/gamepage" element={<CodeEditor />}/>
+            {/* <Route path="/gamepage" element={<CodeEditor />}/> */}
             {/* <Route path="/" element={<Login connectSocket={connectSocket} />} /> */}
             {/* <Route path="/gamepage" element={<Gamingpage />} /> */}
             <Route path="/signup" element={<Singup />}/>

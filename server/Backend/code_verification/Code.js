@@ -79,7 +79,7 @@ const Code = async (userCode, challengeinfo) => {
                 pass += 1;
             }
         }
-        if (pass == 1) {
+        if (pass == 2) {
             return {
                 success: true,
                 message: {
@@ -92,6 +92,7 @@ const Code = async (userCode, challengeinfo) => {
                     ...(logs.length > 0 && { consolelogs: logs.map(item => item) })
                 }
             }
+
         } else {
             return {
                 success: true,

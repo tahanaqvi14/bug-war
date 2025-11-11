@@ -14,8 +14,6 @@ const match_typeDefs = gql`
         status:String
     }
 
-
-    
     input ParticipantInput {
         username: String!
         points: Int
@@ -25,11 +23,12 @@ const match_typeDefs = gql`
         participants: [ParticipantInput!]!
         winner: String
     }
-        
 
     type Mutation {
         createMatch(input: MatchInput!): Match!
+        updatematchpoint(matchId: String!,username:String!): Match!
         updateWinner(matchId: String!, winner: String!): Match!
+        matchinterrupt(matchId: String!,username:String!):Match!
     }
 
     type Query{

@@ -133,12 +133,10 @@ const Mainmenu = () => {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 999,
-          }}
-        >
-          <Secondpage onClose={() => setShowCard(false)}/>
+          }}>
+          <Secondpage onClose={() => setShowCard(false)} />
         </div>
       )}
-
     </div>
   );
 };

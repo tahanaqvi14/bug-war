@@ -5,6 +5,7 @@ export async function Check_login_info(fetchedinfo, context, is_this_a_user) {
     try {
         const result = await bcrypt.compare(fetchedinfo.password, is_this_a_user.password);
         if (result) {
+
             try {
                 let token = generateToken(is_this_a_user);
                 context.res.cookie("token", token, {
@@ -23,7 +24,7 @@ export async function Check_login_info(fetchedinfo, context, is_this_a_user) {
                 await context.req.session.save(err => {
                     if (err) console.error('Failed to save session:', err);
                     else console.log('Session saved successfully');
-                  });
+                });
 
                 return {
                     success: true,
@@ -36,7 +37,6 @@ export async function Check_login_info(fetchedinfo, context, is_this_a_user) {
                     message: error.message
                 };
             }
-
         }
         else {
             return {

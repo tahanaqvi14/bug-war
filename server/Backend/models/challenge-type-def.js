@@ -7,7 +7,6 @@ const challenge_typeDefs = gql`
         problem_statement:String
         id_number:Int
         testcases: [testcase]
-
     }
 
     type testcase {

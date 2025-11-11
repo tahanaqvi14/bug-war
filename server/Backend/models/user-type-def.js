@@ -10,6 +10,7 @@ const typeDefs = gql`
         challenges_completed:[String!]
         totalWins:Int
         total_matches:Int
+        sessiontoken:Boolean
     }
 
     
@@ -73,7 +74,7 @@ const typeDefs = gql`
         Update(input:updateuser):user
         logout:CreateUserResponse!
         finduser_and_savematch(input: [inputformatchsaving!]!): Match!
-
+        remove(input: inputformatchsaving):user
 
         runCode(code: String!): RunResult!
 
