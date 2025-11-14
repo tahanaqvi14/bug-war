@@ -1,10 +1,31 @@
 import { getUserModel } from '../../utils/getUserModel.js'
 import { v4 as uuidv4 } from 'uuid';
 
+const MATCH_DURATION = 10 * 60 * 1000; // 10 minutes
 
 const challenge_resolvers = {
+
     Query: {
-        //// //// ////
+        Get_matchinfo: async (parent, args, context) => {
+            const MatchModel = getUserModel('Matches');
+            const match = await MatchModel.findOne({ matchId: args.matchId });
+    
+            if (!match) {
+                return {
+                    endTime: null,
+                    serverTime: new Date().toISOString(),
+                };
+            }
+    
+            // If using Mongoose, convert document to plain object first
+            const matchObj = match.toObject ? match.toObject() : match;
+    
+            return {
+                ...matchObj,
+                endTime: matchObj.endTime ? matchObj.endTime.toISOString() : null,
+                serverTime: new Date().toISOString(),
+            };
+        }
     },
     Mutation: {
         createMatch: async (parent, args, context) => {
@@ -22,17 +43,28 @@ const challenge_resolvers = {
 
             const matchId = uuidv4();
             const MatchModel = getUserModel('Matches');
+
+            // CALCULATE endTime
+            const now = new Date();
+            const endTime = new Date(now.getTime() + MATCH_DURATION);
+
             const matchinfo = await MatchModel.create({
                 matchId: matchId,
-                participants
+                participants,
+                endTime: endTime       // ADD: End time
             })
+            // CALCULATE endTime
             let forwardingV = matchinfo.toObject();
 
             forwardingV.participants.forEach((participant, index) => {
                 participant.displayName = users[index].displayname;
             });
+
+            // ADD serverTime
+            forwardingV.serverTime = new Date().toISOString();
             return forwardingV;
         },
+
         updatematchpoint: async (parent, args, context) => {
             let matchId = args.matchId;
             let username = args.username
@@ -59,7 +91,10 @@ const challenge_resolvers = {
             // Save match
             await match.save();
 
-            return match;
+            return {
+                match,
+
+            };
 
         },
         matchinterrupt: async (parent, args, context) => {
@@ -81,7 +116,11 @@ const challenge_resolvers = {
             match.winner = opponent ? opponent.username : 'tobedecided';
 
             await match.save();
-            return match;
+
+            return {
+                match,
+
+            };
         }
 
     }

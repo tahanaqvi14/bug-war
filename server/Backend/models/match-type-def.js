@@ -12,6 +12,8 @@ const match_typeDefs = gql`
         winner: String
         matchDate: String
         status:String
+        endTime: String
+        serverTime: String
     }
 
     input ParticipantInput {
@@ -32,7 +34,8 @@ const match_typeDefs = gql`
     }
 
     type Query{
-        Get_matchinfo:[Match]
+          Get_matchinfo(matchId: String!): Match
+
     }
 `
 export default match_typeDefs;

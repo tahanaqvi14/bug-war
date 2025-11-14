@@ -31,7 +31,9 @@ const Matches =mongoose.Schema({
     status:{
         type:String,
         default: 'Incomplete'
-    }
+    },
+    endTime: Date    // When match should end
+
 });
 
 export default Matches;

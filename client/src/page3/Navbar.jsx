@@ -3,16 +3,32 @@ import './css/codeeditor.css';
 import { SocketContext } from '../App';
 import { useStore } from '../../store/Store';
 import { gsap } from "gsap";
+import { useQuery, gql, useLazyQuery } from "@apollo/client";
+
+
+const GET_MATCH = gql`
+query Get_matchinfo($matchId: String!) {
+  Get_matchinfo(matchId: $matchId) {
+    endTime
+    serverTime
+  }
+}
+`;
 
 const Navbar = () => {
     const socket = useContext(SocketContext)
     const [player, setplayerinfo] = useState([])
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [timeOffset, setTimeOffset] = useState(0);
+    const [isEnded, setIsEnded] = useState(false);
+    const [displaytext, setdisplaytext] = useState('Game is getting started1');
+
+
     const matchinfo = useStore((state) => state.data);
     const setData = useStore((state) => state.setData);
 
-    const [timeLeft, setTimeLeft] = useState(5 * 60 + 23); // 5:23 initially
+    // const [timeLeft, setTimeLeft] = useState(5 * 60 + 23);
     const boxRef = useRef(null);
-    const [displaytext,setdisplaytext]=useState('Game is getting started1');
 
     useEffect(() => {
         if (matchinfo?.participants) {
@@ -20,51 +36,111 @@ const Navbar = () => {
         }
     }, [matchinfo])
 
+
+
+    const { data, loading, error } = useQuery(GET_MATCH, {
+        variables: { matchId: matchinfo.matchId },
+        pollInterval: 5000
+    });
+
     useEffect(() => {
-        if (timeLeft <= 0) return;
-        const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
-        return () => clearTimeout(timer);
-      }, [timeLeft]);
+        if (!data || !data.Get_matchinfo) return;
 
-      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-      const seconds = String(timeLeft % 60).padStart(2, "0");
-    
-      useEffect(() => {
+        const match = data.Get_matchinfo; // ✅ define match here
+
+        if (!match.endTime || !match.serverTime) return; // optional safety check
+
+        // --- TIME OFFSET (server vs client) ---
+        const serverNow = new Date(match.serverTime).getTime();
+        const clientNow = Date.now();
+        const offset = serverNow - clientNow;
+        setTimeOffset(offset);
+
+        const end = new Date(match.endTime).getTime();
+
+        // --- LIVE TIMER LOOP ---
+        const interval = setInterval(() => {
+            const now = Date.now() + offset;
+            const remaining = Math.max(0, end - now);
+
+            setTimeLeft(remaining);
+
+            if (remaining === 0 && !isEnded) {
+                setIsEnded(true);
+                clearInterval(interval);
+            }
+        }, 50);
+
+        return () => clearInterval(interval);
+    }, [data, isEnded]);
+
+    // if (loading) return <p>Loading match…</p>;
+    // if (error) return <p>Error: {error.message}</p>;
+
+
+    // Format time nicely
+    const format = ms => {
+        const total = Math.floor(ms / 1000);
+        const m = Math.floor(total / 60);
+        const s = total % 60;
+        return `${m}:${s.toString().padStart(2, "0")}`;
+    };
+
+
+    // useEffect(() => {
+    //     if (timeLeft <= 0) return;
+    //     const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
+    //     return () => clearTimeout(timer);
+    //   }, [timeLeft]);
+    //   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+    //   const seconds = String(timeLeft % 60).padStart(2, "0");
+
+
+    useEffect(() => {
         const tl = gsap.timeline();
-
         tl.fromTo(
-          boxRef.current,
-          { y: -100, opacity: 0 }, // starts above the screen
-          { y: 0, opacity: 1, duration: 2, ease: "power2.out" } // drops down & appears
+            boxRef.current,
+            { y: -100, opacity: 0 }, // starts above the screen
+            { y: 0, opacity: 1, duration: 2, ease: "power2.out" } // drops down & appears
         )
-        .to(
-          boxRef.current,
-          { y: -100, opacity: 0, duration: 2, delay: 5.3, ease: "power2.in" } // then goes back up & fades out
-        );
-      
-      }, [displaytext]);
-    
-      useEffect(() => {
+            .to(
+                boxRef.current,
+                { y: -100, opacity: 0, duration: 2, delay: 5.3, ease: "power2.in" } // then goes back up & fades out
+            );
+
+    }, [displaytext]);
+
+
+    // 1️⃣ create a ref for player
+    const playerRef = useRef(player);
+
+    // 2️⃣ keep the ref updated
+    useEffect(() => {
+        playerRef.current = player;
+    }, [player]);
+
+    useEffect(() => {
         if (!socket) return;
 
-        socket.on('notify',(data,updatedMatch)=>{
+        socket.on('notify', (data, updatedMatch) => {
             console.log(data)
             console.log(updatedMatch)
-            let displayName = player.find(p => p.username === data)?.displayName;
-            console.log(player)
+            let displayName = playerRef.current.find(p => p.username === data)?.displayName;
             console.log(displayName)
             setdisplaytext(`${displayName} solved a problem!`)
             setData(updatedMatch)
         })
-    
+
 
         return () => {
-          socket.off('2players_connected');
-          socket.off('welcome');
+            socket.off('2players_connected');
+            socket.off('welcome');
+            socket.off('notify', handler);
         };
-      }, [socket,player]);
 
-      
+    }, [socket]);
+
+
     return (
         <div className="countdown-page">
             <div className="main-container">
@@ -75,7 +151,7 @@ const Navbar = () => {
                             className="countdown-clock"
                             style={{ color: timeLeft <= 0 ? "#FF0000" : "var(--sun-yellow)" }}
                         >
-                            {timeLeft > 0 ? `${minutes}:${seconds}` : "00:00"}
+                            {isEnded ? "00:00" : format(timeLeft)}
                         </div>
                     </div>
 

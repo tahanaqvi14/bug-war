@@ -6,6 +6,8 @@ import { useQuery, gql, useLazyQuery } from "@apollo/client";
 import { useStore } from '../../store/Store';
 import Navbar from './Navbar';
 import Popup from './Popup'
+// import { GET_MATCH } from "./graphql/matchQueries";
+
 
 const GET_CHALLENGE = gql`
   query Get_challenge {
@@ -18,15 +20,6 @@ const GET_CHALLENGE = gql`
 `
 
 
-// const Get_match=gql`
-//   query Get_matchinfo{
-//   Get_matchinfo{
-//     participants
-//     winner
-//     matchId
-//     }
-//   }
-// `;
 
 const GET_RESULT_OF_CODE = gql`
   query checking_user_code($input: checking_code!) {
@@ -48,7 +41,6 @@ const GET_RESULT_OF_CODE = gql`
 `;
 
 const CodeEditor = () => {
-
   const socket = useContext(SocketContext);
   const navigate = useNavigate();
   const [getChallenge, { data: challenge_data, loading: challenge_loading, error: challenge_error }] = useLazyQuery(GET_CHALLENGE);
@@ -261,10 +253,26 @@ const CodeEditor = () => {
     if (editorRef.current) editorRef.current.setValue(initialCode);
   };
 
+
+
+
+
+
+
+
+
+
+  
   return (
     <div className="maindiv">
       {/* Countdown and Player Section */}
       <Navbar />
+
+
+      {/* <div style={{ fontSize: "40px", margin: "20px 0" }}>
+        {isEnded ? "00:00" : format(timeLeft)}
+      </div> */}
+
 
       {/* Main Editor + Problem Section */}
       <div className="app-container">

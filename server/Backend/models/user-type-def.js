@@ -15,7 +15,7 @@ const typeDefs = gql`
 
     
     type Match {
-        matchId: ID!
+        matchId: String!
         players: [user!]!
     }
     

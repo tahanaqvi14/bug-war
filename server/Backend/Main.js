@@ -6,9 +6,10 @@ import cookieParser from 'cookie-parser';
 // import { createClient } from 'redis';
 import expressSession from 'express-session';
 import usertypeDefs from './models/user-type-def.js'
+import userresolvers from './models/User/user-resolvers.js'
 import challenge_typeDefs from './models/challenge-type-def.js'
 import challenge_resolvers from './models/Challenges/challenge-resolvers.js'
-import userresolvers from './models/User/user-resolvers.js'
+import match_typeDefs from './models/match-type-def.js'
 import matchresolvers from './models/Match/match-resolvers.js'
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { mergeResolvers } from '@graphql-tools/merge';
@@ -29,13 +30,13 @@ import cors from 'cors';
 export const typeDefs = mergeTypeDefs([
   usertypeDefs,
   challenge_typeDefs,
-  // matchresolvers
+  match_typeDefs
 ]);
 
 export const resolvers = mergeResolvers([
   userresolvers,
   challenge_resolvers,
-  // matchresolvers
+  matchresolvers
 ]);
 
 const apolloserver = new ApolloServer({ typeDefs, resolvers });
@@ -271,8 +272,6 @@ io.on('connection', (socket) => {
       const index1 = roomData[index].players.findIndex(
         p => p.socketID == socket.id
       );
-      console.log('socket.id at disconnect:', socket.id);
-      console.log(index1);
       if (index1 > -1) {
 
         let username = roomData[index].players[index1].username;
